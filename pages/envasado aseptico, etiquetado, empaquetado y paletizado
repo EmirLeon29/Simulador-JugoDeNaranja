@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 5: Envasado, Etiquetado y Paletizado</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 20px; color: #334155; }
+        .container { max-width: 650px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        h2 { text-align: center; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .control-group { margin-bottom: 20px; background: #f1f5f9; padding: 15px; border-radius: 8px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        input[type="range"] { width: 100%; margin-bottom: 5px; cursor: pointer; }
+        .val-display { color: #2563eb; font-weight: bold; font-size: 16px; float: right; }
+        .output-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 25px; }
+        .card { background: #eff6ff; padding: 15px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: center; }
+        .card span { display: block; font-size: 28px; font-weight: bold; color: #1d4ed8; margin-top: 5px; }
+        .card-alert { background: #fef2f2; border: 1px solid #fecaca; }
+        .card-alert span { color: #b91c1c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Planta Virtual: Fin de Línea</h2>
+    
+    <!-- Entradas Ajustables -->
+    <div class="control-group">
+        <label>
+            Flujo de entrada desde Pasteurización (L/h)
+            <span class="val-display" id="flujoVal">15000</span>
+        </label>
+        <!-- 15,000 L/h basado en el caso base del TFG -->
+        <input type="range" id="flujoIn" min="5000" max="25000" step="100" value="15000" oninput="calcularProceso()">
+    </div>
+
+    <div class="control-group">
+        <label>
+            Tasa de Defectos (Etiquetado y Sellado) (%)
+            <span class="val-display" id="mermaVal">2.0</span>
+        </label>
+        <input type="range" id="mermaIn" min="0" max="15" step="0.5" value="2" oninput="calcularProceso()">
+    </div>
+
+    <!-- Salidas Gráficas en Vivo -->
+    <div class="output-grid">
+        <div class="card">
+            Botellas PET (1L) Útiles
+            <span id="outBotellas">0</span>
+        </div>
+        <div class="card card-alert">
+            Botellas Rechazadas (Merma)
+            <span id="outMerma">0</span>
+        </div>
+        <div class="card">
+            Packs Producidos (6 uds)
+            <span id="outPacks">0</span>
+        </div>
+        <div class="card">
+            Palets Completos (32 packs)
+            <span id="outPalets">0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcularProceso() {
+        // 1. Obtener Entradas
+        const flujo = parseFloat(document.getElementById('flujoIn').value);
+        const mermaPct = parseFloat(document.getElementById('mermaIn').value);
+        
+        // Actualizar los números en la interfaz
+        document.getElementById('flujoVal').innerText = flujo.toLocaleString();
+        document.getElementById('mermaVal').innerText = mermaPct.toFixed(1);
+
+        // 2. Fundamento Teórico: Balance y Discretización
+        // Un litro de zumo equivale exactamente a un envase PET de 1L
+        const botellasTeoricas = flujo; 
+        
+        const mermaUnidades = botellasTeoricas * (mermaPct / 100);
+        const botellasUtiles = Math.floor(botellasTeoricas - mermaUnidades);
+        
+        // Empaquetado: 6 botellas por pack termoencogible
+        const packs = Math.floor(botellasUtiles / 6);
+        
+        // Paletizado: 2 niveles de 16 packs (32 packs por palet)
+        const palets = Math.floor(packs / 32);
+
+        // 3. Salidas Gráficas en Vivo
+        document.getElementById('outBotellas').innerText = botellasUtiles.toLocaleString();
+        document.getElementById('outMerma').innerText = Math.ceil(mermaUnidades).toLocaleString();
+        document.getElementById('outPacks').innerText = packs.toLocaleString();
+        document.getElementById('outPalets').innerText = palets.toLocaleString();
+    }
+
+    // Ejecutar una vez al abrir la página para cargar el caso base
+    calcularProceso();
+</script>
+
+</body>
+</html>

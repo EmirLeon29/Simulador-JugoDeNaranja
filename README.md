@@ -3,6 +3,8 @@
 Simulador interactivo (Streamlit) del balance de materia de una planta de zumo de naranja:
 selección, lavado, extracción y subproductos, con comparación contra la línea base.
 
+## Colaboradores
+
 
 ## Estructura
 

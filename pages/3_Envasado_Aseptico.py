@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-st.header("Módulo 3: Envasado Aséptico y Fin de Línea")
+st.header("Módulo: Envasado Aséptico")
 st.markdown("---")
 
 st.subheader("Controles de Operación")

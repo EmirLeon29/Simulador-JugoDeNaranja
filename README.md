@@ -4,7 +4,10 @@ Simulador interactivo (Streamlit) del balance de materia de una planta de zumo d
 selección, lavado, extracción y subproductos, con comparación contra la línea base.
 
 ## Colaboradores
-
+- Andrés Hernández Juan Pablo
+- Escalante Pérez Sundhury Sinai
+- León Salinas Emir Armando
+- Manzano Bermudez Armando Eduardo
 
 ## Estructura
 

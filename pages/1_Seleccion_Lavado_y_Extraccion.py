@@ -257,4 +257,4 @@ with tab3:
         st.latex(r"H_{\text{anuales}} = D_{\text{campaña}} \times H_{\text{turno}}")
     with st.container(border=True):
         st.markdown("**Producción volumétrica diaria y horaria de zumo comercial:**")
-        st.latex(r"V_{\text{día}} = \frac{V_{\text{anual}}}{D_{\text{campaña}}}")
+        st.latex(r"V_{\text{día}} = \frac{V_{\text{anual}}}{D_{\text{campaña}}}, V_{\text{h}} = \frac{V_{\text{anual}}}{D_{\text{anuales}}}")

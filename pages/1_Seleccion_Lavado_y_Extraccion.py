@@ -258,3 +258,6 @@ with tab3:
     with st.container(border=True):
         st.markdown("**Producción volumétrica diaria y horaria de zumo comercial:**")
         st.latex(r"V_{\text{día}} = \frac{V_{\text{anual}}}{D_{\text{campaña}}}, V_{\text{h}} = \frac{V_{\text{anual}}}{D_{\text{anuales}}}")
+    with st.container(border=True):
+        st.markdown("**Flujo másico de zumo comercial (anual y diario):**")
+        st.latex(r"m_{\text{zumo comercial}} = V_{\text{anual}} \times \rho, m_{\text{zumo, día}} = \frac{m_{\text{zumo comercial}}}{D_{\text{campaña}}}")

@@ -33,7 +33,6 @@ ETIQUETAS_PARAMETROS = [
     ("produccion_anual_l", "Producción de Jugo Comercial (l/año)"),
     ("dias_campana", "Días de Campaña Extracción (días/año)"),
     ("horas_turno", "Horas por Turno (h/día)"),
-    ("densidad_zumo", "Densidad del Jugo (kg/l)"),
     ("pulpa_extractor_pct", "Pulpa Salida Extractor (%)"),
     ("pulpa_comercial_pct", "Pulpa Jugo Comercial (%)"),
     ("rend_sel_1_pct", "Rendimiento 1.ª Selección (%)"),

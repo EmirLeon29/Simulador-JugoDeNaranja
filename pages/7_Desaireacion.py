@@ -5,12 +5,9 @@ import socketserver
 import urllib.parse
 import webbrowser
 import threading
-import os
 from io import BytesIO
+from urllib.request import urlopen
 from PIL import Image, ImageDraw, ImageFont
-
-# Directorio base exacto donde vive este script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =============================================================================
 # 1. MOTOR MATEMÁTICO EN UNIDADES SI (Módulo de Desaireación)
@@ -54,31 +51,13 @@ def simular_desaireacion(
         "volumen_tanque": round(volumen_total_litros, 1),
     }
 
-def encontrar_archivo(nombre_base):
-    print(f"\n--- DIAGNÓSTICO DE ARCHIVOS ---")
-    print(f"Carpeta donde busca Python (BASE_DIR): {BASE_DIR}")
-    if os.path.exists(BASE_DIR):
-        print(f"Archivos reales en esa carpeta: {os.listdir(BASE_DIR)}")
-    
-    candidatos = [
-        os.path.join(BASE_DIR, nombre_base),
-        os.path.join(BASE_DIR, nombre_base + ".png"),
-        os.path.join(BASE_DIR, nombre_base + ".jpg"),
-        os.path.join(BASE_DIR, nombre_base + ".png.png"),
-        os.path.join(BASE_DIR, nombre_base + ".jpg.jpg")
-    ]
-    for c in candidatos:
-        existe = os.path.exists(c)
-        print(f"Probando: {c} -> ¿Existe?: {existe}")
-        if existe:
-            return c
-    return None
-
 def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
-    img_path = encontrar_archivo("image_17")
-        
-    if img_path and os.path.exists(img_path):
-        img = Image.open(img_path).convert("RGB")
+    """Descarga la imagen del equipo directamente desde GitHub y estampa la telemetría"""
+    url_imagen = "https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/image_17.png"
+    try:
+        with urlopen(url_imagen) as response:
+            img_data = response.read()
+        img = Image.open(BytesIO(img_data)).convert("RGB")
         draw = ImageDraw.Draw(img)
         try:
             font_numero = ImageFont.truetype("arial.ttf", 28)
@@ -96,17 +75,18 @@ def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
-    else:
+    except Exception as e:
+        # Imagen de respaldo por si no hay internet al momento de correrlo
         img = Image.new("RGB", (600, 800), color=(240, 240, 240))
         draw = ImageDraw.Draw(img)
-        draw.text((50, 50), "Imagen image_17 no encontrada", fill=(255, 0, 0))
+        draw.text((30, 50), f"Error cargando imagen web: {e}", fill=(255, 0, 0))
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
 
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + ENLACES WEB DIRECTOS)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">
@@ -164,8 +144,9 @@ HTML_PAGINA = """<!DOCTYPE html>
             <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
         </div>
         <div class="logos-container">
-            <img src="/logo_unam" class="logo-img" alt="Logo UNAM">
-            <img src="/logo_fes" class="logo-img" alt="Logo FES Zaragoza">
+            <!-- Enlaces web directos a los escudos en GitHub -->
+            <img src="https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/logo_unam.png" class="logo-img" alt="Logo UNAM">
+            <img src="https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/logo_fes.png" class="logo-img" alt="Logo FES Zaragoza">
         </div>
     </div>
 
@@ -284,22 +265,6 @@ class ManejadorDesaireacion(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-type", "image/png")
             self.end_headers()
             self.wfile.write(png_bytes)
-
-        elif path in ["/logo_unam", "/logo_fes"]:
-            nombre_base = path[1:]
-            archivo_encontrado = encontrar_archivo(nombre_base)
-            if archivo_encontrado and os.path.exists(archivo_encontrado):
-                with open(archivo_encontrado, "rb") as f:
-                    content = f.read()
-                self.send_response(200)
-                if archivo_encontrado.endswith(".png") or archivo_encontrado.endswith(".png.png"):
-                    self.send_header("Content-type", "image/png")
-                else:
-                    self.send_header("Content-type", "image/jpeg")
-                self.end_headers()
-                self.wfile.write(content)
-            else:
-                self.send_error(404, "Logo no encontrado")
 
         elif path == "/simular":
             caudal = float(qs.get("caudal", [1959.38])[0])

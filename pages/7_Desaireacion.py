@@ -12,48 +12,61 @@ st.set_page_config(
 # --- ESTILOS CSS CON TIPOGRAFÍA Y DISEÑO INSTITUCIONAL ---
 st.markdown("""
     <style>
-    /* Forzar fondo blanco puro en toda la aplicación */
+    /* Forzar fondo blanco puro y texto negro en toda la aplicación */
     .stApp {
-        background-color: #FFFFFF;
-        color: #111111;
+        background-color: #FFFFFF !important;
+        color: #111111 !important;
+    }
+    
+    /* Forzar texto negro en etiquetas de sliders, inputs, métricas y tablas */
+    p, label, .stCaption, span, div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stMetricValue"], div[data-testid="stMetricLabel"] p,
+    div[data-testid="stMarkdownContainer"] p, table, th, td {
+        font-family: Arial, sans-serif !important;
+        color: #111111 !important;
+    }
+
+    p, label, .stCaption {
+        font-size: 15px !important;
     }
     
     /* Tipografía institucional en tamaños grandes */
     .inst-univ {
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif !important;
         font-size: 28px !important;
-        font-weight: bold;
-        color: #1b365d;
+        font-weight: bold !important;
+        color: #1b365d !important;
         margin-bottom: 2px;
         line-height: 1.1;
     }
     .inst-fac {
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif !important;
         font-size: 22px !important;
-        font-weight: bold;
-        color: #b38f00;
+        font-weight: bold !important;
+        color: #b38f00 !important;
         margin-top: 2px;
         margin-bottom: 6px;
         line-height: 1.2;
     }
     .mod-title {
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif !important;
         font-size: 18px !important;
-        font-weight: normal;
-        color: #555555;
+        font-weight: normal !important;
+        color: #555555 !important;
         margin-top: 2px;
     }
     
     /* Estilos generales del cuerpo */
     h2, h3, .stSubheader {
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif !important;
         font-size: 20px !important;
         font-weight: bold !important;
         color: #1b365d !important;
     }
-    p, label, .stCaption {
-        font-family: Arial, sans-serif;
-        font-size: 15px !important;
+
+    /* Mantener texto blanco únicamente dentro del botón principal rojo */
+    button[kind="primary"] p {
+        color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -122,7 +135,7 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
         
         # Si recibe datos externos de un compañero, los toma automáticamente; si no, usa los sliders locales
         if caudal_ext is not None:
-            st.info(f"🔗 **Conectado al tren de proceso:** Recibiendo caudal de corriente anterior.")
+            st.info("🔗 **Conectado al tren de proceso:** Recibiendo caudal de corriente anterior.")
             caudal_entrada = caudal_ext
             st.metric("Caudal de Zumo Recibido (kg/h)", f"{caudal_entrada:.2f}")
         else:

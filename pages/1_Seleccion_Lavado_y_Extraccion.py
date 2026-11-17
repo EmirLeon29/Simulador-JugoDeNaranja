@@ -299,7 +299,6 @@ with tab3:
     with st.container(border=True):
         st.markdown("**Simulación acumulada hora a hora en un turno:**")
         st.latex(r"M_{i,\text{acum}}(h) = \dot{m}_{i,\text{h}} \times h")
-
     st.markdown("En donde para la ia de Gemini IA se le dio el siguiente prompt."
     
 

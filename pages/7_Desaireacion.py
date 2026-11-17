@@ -2,72 +2,51 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-# Configuración del dashboard a pantalla completa y fondo blanco por defecto
+# Configuración del dashboard a pantalla completa
 st.set_page_config(
     page_title="Módulo de Desaireación - Zumo de Naranja", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS CON TIPOGRAFÍA Y DISEÑO INSTITUCIONAL ---
+# --- ESTILOS CSS CON TIPOGRAFÍA INSTITUCIONAL ---
 st.markdown("""
     <style>
-    /* Forzar fondo blanco puro y texto negro en toda la aplicación */
-    .stApp {
-        background-color: #FFFFFF !important;
-        color: #111111 !important;
-    }
-    
-    /* Forzar texto negro en etiquetas de sliders, inputs, métricas y tablas */
-    p, label, .stCaption, span, div[data-testid="stWidgetLabel"] p,
-    div[data-testid="stMetricValue"], div[data-testid="stMetricLabel"] p,
-    div[data-testid="stMarkdownContainer"] p, table, th, td {
-        font-family: Arial, sans-serif !important;
-        color: #111111 !important;
-    }
-
-    p, label, .stCaption {
-        font-size: 15px !important;
-    }
-    
     /* Tipografía institucional en tamaños grandes */
     .inst-univ {
-        font-family: Arial, sans-serif !important;
+        font-family: Arial, sans-serif;
         font-size: 28px !important;
-        font-weight: bold !important;
-        color: #1b365d !important;
+        font-weight: bold;
+        color: #1b365d;
         margin-bottom: 2px;
         line-height: 1.1;
     }
     .inst-fac {
-        font-family: Arial, sans-serif !important;
+        font-family: Arial, sans-serif;
         font-size: 22px !important;
-        font-weight: bold !important;
-        color: #b38f00 !important;
+        font-weight: bold;
+        color: #b38f00;
         margin-top: 2px;
         margin-bottom: 6px;
         line-height: 1.2;
     }
     .mod-title {
-        font-family: Arial, sans-serif !important;
+        font-family: Arial, sans-serif;
         font-size: 18px !important;
-        font-weight: normal !important;
-        color: #555555 !important;
+        font-weight: normal;
+        color: #888888;
         margin-top: 2px;
     }
     
     /* Estilos generales del cuerpo */
     h2, h3, .stSubheader {
-        font-family: Arial, sans-serif !important;
+        font-family: Arial, sans-serif;
         font-size: 20px !important;
         font-weight: bold !important;
-        color: #1b365d !important;
     }
-
-    /* Mantener texto blanco en botones primarios y cuadros de alerta oscuros */
-    button[kind="primary"] p,
-    div[data-testid="stAlert"] p {
-        color: #FFFFFF !important;
+    p, label, .stCaption {
+        font-family: Arial, sans-serif;
+        font-size: 15px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -100,7 +79,6 @@ def generar_imagen_dinamica(presion, temperatura):
         img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         
-        # Tamaño intermedio ideal para que respire dentro de los recuadros verdes
         font_numero = cargar_fuente(34)
         font_unidad = cargar_fuente(17)
             
@@ -230,23 +208,4 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
                 "| :--- | :--- | :--- |"
             ]
             presiones_sim = [3.0, 5.0, 7.0, 9.0, 12.0, 15.0, 20.0]
-            for p in presiones_sim:
-                ef = min(98.0, max(85.0, 95.0 - (p - 7.0) * 0.5))
-                o2_res = oxigeno_inicial * (1 - ef / 100.0)
-                lineas_tabla.append(f"| {p:.1f} | {ef:.1f}% | {o2_res:.2f} |")
-            
-            st.markdown("\n".join(lineas_tabla))
-
-    # Columna Derecha: Panel SCADA (Imagen interactiva)
-    with col_results:
-        st.subheader("Panel SCADA - Vista en Vivo del Equipo")
-        img_dinamica = generar_imagen_dinamica(presion_vacio, temp_entrada)
-        if img_dinamica:
-            st.image(img_dinamica, caption=f"Telemetría Activa | Vacío: {presion_vacio:.1f} kPa | Temp: {temp_entrada:.1f} °C", use_container_width=True)
-        else:
-            st.warning("⚠️ No se encontró la imagen del equipo en la carpeta del proyecto.")
-            
-    return caudal_salida, oxigeno_salida
-
-if __name__ == "__main__":
-    run_desaireacion()
+            for p in pres

@@ -11,6 +11,6 @@ selección, lavado, extracción y subproductos, con comparación contra la líne
 
 ## Estructura
 
-- `Simulador Planta de Zumo de Naranja`: Pagina principal y Configuración de la Pagina
+- `Simulador_Planta_de_Zumo_de_Naranja.py`: Pagina principal y Configuración de la Pagina
 - `requirements.txt`: Dependencias y Motor de gráficos 
 - `pages`: Carpeta contenedora de motor de calculo para cada operación

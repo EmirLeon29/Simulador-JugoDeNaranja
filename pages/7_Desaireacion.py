@@ -9,7 +9,7 @@ import os
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 
-# Directorio base exacto donde vive este script (carpeta pages/)
+# Directorio base exacto donde vive este script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =============================================================================
@@ -55,7 +55,11 @@ def simular_desaireacion(
     }
 
 def encontrar_archivo(nombre_base):
-    # Busca robustamente usando la ruta absoluta del directorio base
+    print(f"\n--- DIAGNÓSTICO DE ARCHIVOS ---")
+    print(f"Carpeta donde busca Python (BASE_DIR): {BASE_DIR}")
+    if os.path.exists(BASE_DIR):
+        print(f"Archivos reales en esa carpeta: {os.listdir(BASE_DIR)}")
+    
     candidatos = [
         os.path.join(BASE_DIR, nombre_base),
         os.path.join(BASE_DIR, nombre_base + ".png"),
@@ -64,7 +68,9 @@ def encontrar_archivo(nombre_base):
         os.path.join(BASE_DIR, nombre_base + ".jpg.jpg")
     ]
     for c in candidatos:
-        if os.path.exists(c):
+        existe = os.path.exists(c)
+        print(f"Probando: {c} -> ¿Existe?: {existe}")
+        if existe:
             return c
     return None
 
@@ -109,8 +115,6 @@ HTML_PAGINA = """<!DOCTYPE html>
     <title>Módulo de Desaireación - Zumo de Naranja</title>
     <style>
         body { font-family: Arial, sans-serif; background: #FFFFFF; margin: 0; padding: 0; color: #111111; }
-        
-        /* Franja superior en Azul Cerúleo institucional */
         .header-banner {
             background-color: #0092B2;
             color: white;
@@ -127,12 +131,10 @@ HTML_PAGINA = """<!DOCTYPE html>
         .logos-container { display: flex; gap: 20px; align-items: center; background: white; padding: 10px 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
         .logo-img { height: 75px; width: auto; object-fit: contain; }
 
-        /* Contenedor principal a 2 columnas */
         .main-container { padding: 30px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; max-width: 1600px; margin: auto; }
         .card { background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         
         h3 { color: #0092B2; font-family: Arial, sans-serif; font-size: 20px; margin-top: 0; }
-        
         .slider-group { margin-bottom: 18px; }
         .slider-group label { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #1e293b; }
         .slider-group input[type=range] { width: 100%; accent-color: #0092B2; height: 6px; }
@@ -155,7 +157,6 @@ HTML_PAGINA = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <!-- Franja Superior en Azul Cerúleo con Títulos e Insignias -->
     <div class="header-banner">
         <div>
             <p class="inst-univ">Universidad Nacional Autónoma de México</p>
@@ -168,9 +169,7 @@ HTML_PAGINA = """<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- Contenido Principal -->
     <div class="main-container">
-        <!-- Columna Izquierda: Parámetros, Alertas y Cálculos -->
         <div class="card">
             <h3>1. Parámetros de Entrada</h3>
             <div class="slider-group">
@@ -200,7 +199,6 @@ HTML_PAGINA = """<!DOCTYPE html>
             </div>
 
             <h3 style="margin-top: 30px;">3. Comportamiento del Sistema</h3>
-            <p style="font-size: 13px; color: #64748b;">Sensibilidad: Presión de Vacío vs. Oxígeno Residual</p>
             <table>
                 <thead>
                     <tr><th>Presión (kPa)</th><th>Eficiencia (%)</th><th>O₂ Residual (mg/L)</th></tr>
@@ -210,11 +208,10 @@ HTML_PAGINA = """<!DOCTYPE html>
             </table>
         </div>
 
-        <!-- Columna Derecha: Panel SCADA con la Imagen Dinámica del Equipo -->
         <div class="card scada-viewer">
             <h3>Panel SCADA - Vista en Vivo del Equipo</h3>
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;" id="caption_scada">Telemetría Activa | Vacío: 7.0 kPa | Temp: 25.0 °C</p>
-            <img id="scada_img" src="/scada.png?presion=7.0&temp=25.0" alt="Panel SCADA Desaireación">
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;" id="caption_scada">Telemetría Activa</p>
+            <img id="scada_img" src="/scada.png?presion=7.0&temp=25.0" alt="Panel SCADA">
         </div>
     </div>
 
@@ -240,9 +237,6 @@ HTML_PAGINA = """<!DOCTYPE html>
             if (!data.actual.valido) {
                 alerta.className = "alerta peligro";
                 alerta.innerText = data.actual.error_msg;
-                document.getElementById('kpi_zumo').innerText = "N/A";
-                document.getElementById('kpi_o2res').innerText = "N/A";
-                document.getElementById('kpi_vol').innerText = "N/A";
                 return;
             } else {
                 alerta.className = "alerta seguro";

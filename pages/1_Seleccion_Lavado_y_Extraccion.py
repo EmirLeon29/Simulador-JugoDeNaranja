@@ -316,4 +316,12 @@ with tab3:
     st.markdown("“Hola Claude tengo unos código listos para ejecutar en una página web, pero me puedes ayudar a crear los archivos necesarios para crear y ejecutar la página por medio de un link, ajustarlos para funcionar con la librería biblioteca Streamlit, y en github, por favor y gracias”")
     st.markdown("“Hola, Claude deidad, necesito que adaptes este código  para poder integrarlo a la biblioteca de Streamlit, adjuntando el código hecho por gemini y modificado por los miembros del equipo”")
 
+st.markdown("---")
+st.markdown(
+    """
+    Referencias.
+    - Operaciones preliminares de acondicionamiento: Fellows, 2017; Ibarz & Barbosa-Cánovas, 2005.
+    -Funcionamiento de extractores rotatorios tipo Brown y control de aceites esenciales: Bates et al., 2001; Kimball, 1999. 
+    """
+)
 

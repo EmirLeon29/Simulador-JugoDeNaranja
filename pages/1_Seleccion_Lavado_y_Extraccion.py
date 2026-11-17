@@ -1,6 +1,6 @@
 """
 Simulador Interactivo de Proceso: Selección, Lavado y Extracción
-Planta de Zumo de Naranja (1.500.000 l/año) - versión Streamlit
+Planta de Jugo de Naranja (1.500.000 l/año) - versión Streamlit
 Ejecutar:  streamlit run app.py
 """
 
@@ -30,12 +30,12 @@ LINEA_BASE = {
 }
 
 ETIQUETAS_PARAMETROS = [
-    ("produccion_anual_l", "Producción de Zumo Comercial (l/año)"),
+    ("produccion_anual_l", "Producción de Jugo Comercial (l/año)"),
     ("dias_campana", "Días de Campaña Extracción (días/año)"),
     ("horas_turno", "Horas por Turno (h/día)"),
-    ("densidad_zumo", "Densidad del Zumo (kg/l)"),
+    ("densidad_zumo", "Densidad del Jugo (kg/l)"),
     ("pulpa_extractor_pct", "Pulpa Salida Extractor (%)"),
-    ("pulpa_comercial_pct", "Pulpa Zumo Comercial (%)"),
+    ("pulpa_comercial_pct", "Pulpa Jugo Comercial (%)"),
     ("rend_sel_1_pct", "Rendimiento 1.ª Selección (%)"),
     ("rend_lavado_pct", "Rendimiento Lavado (%)"),
     ("rend_sel_2_pct", "Rendimiento 2.ª Selección (%)"),
@@ -87,7 +87,7 @@ def resolver_balance(p: dict) -> dict:
         ("3. Naranja a 2ª Selección", m_ent_sel_2),
         ("   -> Destrío 2ª Selección", m_destrio_2),
         ("4. Naranja apta (Entrada Extracción)", m_naranja_ext),
-        ("   -> Salida Zumo bruto (12% pulpa)", m_zumo_bruto),
+        ("   -> Salida Jugo bruto (12% pulpa)", m_zumo_bruto),
         ("   -> Salida Piel y semillas", m_piel_semillas),
         ("   -> Salida Emulsión oleosa pura", m_emulsion_pura),
         ("   -> Agua añadida en extractores", m_agua_ext),
@@ -156,7 +156,7 @@ def restaurar_base():
 
 
 st.title("🍊 Simulador de Proceso: Selección, Lavado y Extracción")
-st.caption("Planta de Zumo de Naranja · Balance de materia")
+st.caption("Planta de Jugo de Naranja · Balance de materia")
 
 # --- Barra lateral: parámetros editables ---
 with st.sidebar:
@@ -206,7 +206,7 @@ with tab1:
         )
     st.dataframe(pd.DataFrame(filas), hide_index=True, use_container_width=True)
 
-    st.subheader("Producción de Zumo Comercial")
+    st.subheader("Producción de Jugo Comercial")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Anual (l/año)", fmt(enl["zumo_l_ano"]))
     c2.metric("Diaria (l/día)", fmt(enl["zumo_l_dia"]))
@@ -215,7 +215,7 @@ with tab1:
 
     st.subheader("Puntos de Enlace con el Resto de la Planta")
     e1, e2, e3, e4 = st.columns(4)
-    e1.metric("Rendimiento global fruta → zumo bruto", f"{fmt(enl['rendimiento_global_pct'])} %")
+    e1.metric("Rendimiento global fruta → jugo bruto", f"{fmt(enl['rendimiento_global_pct'])} %")
     e2.metric("A Tamizado/Pasteurización (kg/h)", fmt(enl["zumo_bruto_kg_h"]))
     e3.metric("A Línea Aceite: Emulsión + Agua (kg/h)", fmt(enl["emulsion_diluida_kg_h"]))
     e4.metric("A Subproductos Sólidos (kg/h)", fmt(enl["subproductos_solidos_kg_h"]))
@@ -238,7 +238,7 @@ with tab2:
                 "Recepción Acum. (kg)": fmt(h_recep * h),
                 "Destríos/Merma (kg)": fmt(h_destrios * h),
                 "A Extracción (kg)": fmt(h_ext * h),
-                "Zumo Bruto 12% (kg)": fmt(h_zumo * h),
+                "Jugo Bruto 12% (kg)": fmt(h_zumo * h),
                 "Piel/Semillas (kg)": fmt(h_piel * h),
                 "Emulsión+Agua (kg)": fmt(h_emul_dil * h),
             }

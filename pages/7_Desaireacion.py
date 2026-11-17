@@ -5,11 +5,6 @@ import socketserver
 import urllib.parse
 import webbrowser
 import threading
-import os
-from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =============================================================================
 # 1. MOTOR MATEMÁTICO EN UNIDADES SI (Módulo de Desaireación)
@@ -53,55 +48,9 @@ def simular_desaireacion(
         "volumen_tanque": round(volumen_total_litros, 1),
     }
 
-def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
-    """Busca la imagen real del desaireador (JPG o PNG) y estampa la telemetría"""
-    candidatos = [
-        os.path.join(BASE_DIR, "image_17.jpg"),
-        os.path.join(BASE_DIR, "image_17.png"),
-        os.path.join(BASE_DIR, "pages", "image_17.jpg"),
-        os.path.join(BASE_DIR, "pages", "image_17.png"),
-        "image_17.jpg",
-        "image_17.png"
-    ]
-    
-    img_path = None
-    for c in candidatos:
-        if os.path.exists(c):
-            img_path = c
-            break
-            
-    if img_path:
-        img = Image.open(img_path).convert("RGB")
-        draw = ImageDraw.Draw(img)
-        try:
-            font_numero = ImageFont.truetype("arial.ttf", 32)
-            font_unidad = ImageFont.truetype("arial.ttf", 16)
-        except:
-            font_numero = ImageFont.load_default()
-            font_unidad = ImageFont.load_default()
-            
-        # Coordenadas exactas para los displays de la pantalla de tu imagen real
-        draw.text((552, 370), f"{presion:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((552, 397), "kPa", fill=(70, 70, 70), font=font_unidad, anchor="mm")
-        
-        draw.text((553, 468), f"{temperatura:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((553, 495), "°C", fill=(70, 70, 70), font=font_unidad, anchor="mm")
-        
-        buf = BytesIO()
-        img.save(buf, format="JPEG", quality=90)
-        return buf.getvalue()
-    else:
-        # Lienzo de respaldo si llegara a faltar el archivo local
-        img = Image.new("RGB", (600, 800), color=(240, 240, 240))
-        draw = ImageDraw.Draw(img)
-        draw.text((30, 50), "Coloca 'image_17.jpg' en la carpeta", fill=(255, 0, 0))
-        buf = BytesIO()
-        img.save(buf, format="JPEG")
-        return buf.getvalue()
-
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + ESCUDOS INSTITUCIONALES)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA DIGITAL + AZUL CERÚLEO)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">
@@ -109,62 +58,79 @@ HTML_PAGINA = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <title>Módulo de Desaireación - Zumo de Naranja</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #FFFFFF; margin: 0; padding: 0; color: #111111; }
+        body { font-family: Arial, sans-serif; background: #f8fafc; margin: 0; padding: 0; color: #111111; }
+        
+        /* Franja superior en Azul Cerúleo institucional */
         .header-banner {
             background-color: #0092B2;
             color: white;
-            padding: 20px 35px;
+            padding: 22px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        .inst-univ { font-family: Arial, sans-serif; font-size: 26px; font-weight: bold; margin: 0; color: white; }
-        .inst-fac { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; margin: 4px 0; color: #fef08a; }
-        .mod-title { font-family: Arial, sans-serif; font-size: 16px; margin: 0; color: #e0f2fe; }
+        .inst-univ { font-size: 25px; font-weight: bold; margin: 0; color: white; }
+        .inst-fac { font-size: 19px; font-weight: bold; margin: 4px 0; color: #fef08a; }
+        .mod-title { font-size: 15px; margin: 0; color: #e0f2fe; }
         
-        .logos-container { display: flex; gap: 20px; align-items: center; background: white; padding: 10px 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-        .logo-img { height: 75px; width: auto; object-fit: contain; }
+        .badge-unam { 
+            background: white; 
+            color: #0092B2; 
+            padding: 10px 18px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 15px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
 
         .main-container { padding: 30px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; max-width: 1600px; margin: auto; }
         .card { background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         
-        h3 { color: #0092B2; font-family: Arial, sans-serif; font-size: 20px; margin-top: 0; }
+        h3 { color: #0092B2; font-size: 19px; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+        
         .slider-group { margin-bottom: 18px; }
-        .slider-group label { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #1e293b; }
+        .slider-group label { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 6px; color: #1e293b; }
         .slider-group input[type=range] { width: 100%; accent-color: #0092B2; height: 6px; }
         
-        .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
-        .kpi { background: #f0f9ff; border-left: 5px solid #0092B2; padding: 15px; border-radius: 8px; }
-        .kpi .titulo { font-size: 13px; color: #475569; font-weight: bold; }
-        .kpi .valor { font-size: 20px; font-weight: bold; color: #0092B2; margin-top: 5px; }
+        .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
+        .kpi { background: #f0f9ff; border-left: 5px solid #0092B2; padding: 12px; border-radius: 8px; }
+        .kpi .titulo { font-size: 12px; color: #475569; font-weight: bold; }
+        .kpi .valor { font-size: 18px; font-weight: bold; color: #0092B2; margin-top: 4px; }
         
-        .alerta { padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; margin-bottom: 20px; text-align: center; }
+        .alerta { padding: 14px; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-align: center; }
         .seguro { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .peligro { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: center; }
         th { background: #e0f2fe; color: #0092B2; font-weight: bold; }
-        
-        .scada-viewer { text-align: center; }
-        .scada-viewer img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+
+        /* Panel SCADA digital profesional */
+        .scada-panel { background: #0f172a; color: #38bdf8; padding: 25px; border-radius: 10px; font-family: monospace; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
+        .scada-screen { background: #020617; border: 2px solid #38bdf8; padding: 20px; border-radius: 8px; margin-top: 15px; }
+        .scada-row { display: flex; justify-content: space-between; margin: 12px 0; font-size: 16px; border-bottom: 1px dashed #1e293b; padding-bottom: 8px; }
+        .scada-label { color: #94a3b8; }
+        .scada-val { color: #4ade80; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
+    <!-- Franja Superior en Azul Cerúleo -->
     <div class="header-banner">
         <div>
             <p class="inst-univ">Universidad Nacional Autónoma de México</p>
             <p class="inst-fac">Facultad de Estudios Superiores Zaragoza</p>
             <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
         </div>
-        <div class="logos-container">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Escudo_UNAM_vertical.svg" class="logo-img" alt="Escudo UNAM">
-            <img src="https://www.zaragoza.unam.mx/wp-content/2023/Descargas/FESZ50_color_transp.png" class="logo-img" alt="Escudo FES Zaragoza">
+        <div class="badge-unam">
+            UNAM • FES ZARAGOZA
         </div>
     </div>
 
+    <!-- Contenido Principal -->
     <div class="main-container">
+        <!-- Columna Izquierda: Parámetros y Cálculos -->
         <div class="card">
             <h3>1. Parámetros de Entrada</h3>
             <div class="slider-group">
@@ -176,11 +142,11 @@ HTML_PAGINA = """<!DOCTYPE html>
                 <input type="range" id="presion" min="3.0" max="50.0" step="0.5" value="7.0" oninput="actualizar()">
             </div>
             <div class="slider-group">
-                <label><span>Temperatura de Entrada del Zumo (°C):</span> <span id="val_temp">25.0</span></label>
+                <label><span>Temperatura de Entrada (°C):</span> <span id="val_temp">25.0</span></label>
                 <input type="range" id="temp" min="10.0" max="90.0" step="1.0" value="25.0" oninput="actualizar()">
             </div>
             <div class="slider-group">
-                <label><span>Oxígeno Disuelto Inicial (mg/L o ppm):</span> <span id="val_o2">10.0</span></label>
+                <label><span>Oxígeno Disuelto Inicial (mg/L):</span> <span id="val_o2">10.0</span></label>
                 <input type="range" id="o2" min="5.0" max="25.0" step="0.5" value="10.0" oninput="actualizar()">
             </div>
 
@@ -193,7 +159,7 @@ HTML_PAGINA = """<!DOCTYPE html>
                 <div class="kpi"><div class="titulo">Vol. Tanque</div><div class="valor" id="kpi_vol">-</div></div>
             </div>
 
-            <h3 style="margin-top: 30px;">3. Comportamiento del Sistema</h3>
+            <h3 style="margin-top: 25px;">3. Comportamiento del Sistema</h3>
             <table>
                 <thead>
                     <tr><th>Presión (kPa)</th><th>Eficiencia (%)</th><th>O₂ Residual (mg/L)</th></tr>
@@ -203,10 +169,22 @@ HTML_PAGINA = """<!DOCTYPE html>
             </table>
         </div>
 
-        <div class="card scada-viewer">
-            <h3>Panel SCADA - Vista en Vivo del Equipo</h3>
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;" id="caption_scada">Telemetría Activa</p>
-            <img id="scada_img" src="/scada.png?presion=7.0&temp=25.0" alt="Panel SCADA">
+        <!-- Columna Derecha: Panel SCADA Digital en Vivo -->
+        <div class="card">
+            <h3>Panel SCADA - Telemetría del Equipo</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">Modelo DV-100-S | Estado del Sistema en Tiempo Real</p>
+            
+            <div class="scada-panel">
+                <div style="font-size: 14px; color: #facc15; font-weight: bold; margin-bottom: 5px;">⚡ PLC HMI - DESAIREADOR INDUSTRIAL</div>
+                <div class="scada-screen">
+                    <div class="scada-row"><span class="scada-label">ESTADO:</span> <span class="scada-val" style="color:#4ade80;">OPERATIVO</span></div>
+                    <div class="scada-row"><span class="scada-label">PRESIÓN CÁMARA:</span> <span class="scada-val" id="scada_presion">7.0 kPa</span></div>
+                    <div class="scada-row"><span class="scada-label">TEMP. ENTRADA:</span> <span class="scada-val" id="scada_temp">25.0 °C</span></div>
+                    <div class="scada-row"><span class="scada-label">EFICIENCIA VACÍO:</span> <span class="scada-val" id="scada_ef">95.0 %</span></div>
+                    <div class="scada-row"><span class="scada-label">CAUDAL SALIDA:</span> <span class="scada-val" id="scada_zumo">-</span></div>
+                    <div class="scada-row"><span class="scada-label">OXÍGENO RESIDUAL:</span> <span class="scada-val" id="scada_o2">-</span></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -221,9 +199,6 @@ HTML_PAGINA = """<!DOCTYPE html>
             document.getElementById('val_presion').innerText = presion.toFixed(1);
             document.getElementById('val_temp').innerText = temp.toFixed(1);
             document.getElementById('val_o2').innerText = o2.toFixed(1);
-
-            document.getElementById('scada_img').src = `/scada.png?presion=${presion}&temp=${temp}`;
-            document.getElementById('caption_scada').innerText = `Telemetría Activa | Vacío: ${presion.toFixed(1)} kPa | Temp: ${temp.toFixed(1)} °C`;
 
             const resp = await fetch(`/simular?caudal=${caudal}&presion=${presion}&temp=${temp}&o2=${o2}`);
             const data = await resp.json();
@@ -242,6 +217,13 @@ HTML_PAGINA = """<!DOCTYPE html>
             document.getElementById('kpi_zumo').innerText = r.caudal_salida.toFixed(2) + " kg/h";
             document.getElementById('kpi_o2res').innerText = r.oxigeno_salida.toFixed(2) + " mg/L";
             document.getElementById('kpi_vol').innerText = r.volumen_tanque.toFixed(1) + " L";
+
+            // Actualiza pantallas del SCADA digital
+            document.getElementById('scada_presion').innerText = presion.toFixed(1) + " kPa";
+            document.getElementById('scada_temp').innerText = temp.toFixed(1) + " °C";
+            document.getElementById('scada_ef').innerText = r.eficiencia_remocion.toFixed(1) + " %";
+            document.getElementById('scada_zumo').innerText = r.caudal_salida.toFixed(2) + " kg/h";
+            document.getElementById('scada_o2').innerText = r.oxigeno_salida.toFixed(2) + " mg/L";
 
             let filas = "";
             data.tabla.forEach(row => {
@@ -270,15 +252,6 @@ class ManejadorDesaireacion(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html; charset=utf-8")
             self.end_headers()
             self.wfile.write(HTML_PAGINA.encode("utf-8"))
-
-        elif path == "/scada.png":
-            presion = float(qs.get("presion", [7.0])[0])
-            temp = float(qs.get("temp", [25.0])[0])
-            png_bytes = generar_imagen_scada_bytes(presion, temp)
-            self.send_response(200)
-            self.send_header("Content-type", "image/jpeg")
-            self.end_headers()
-            self.wfile.write(png_bytes)
 
         elif path == "/simular":
             caudal = float(qs.get("caudal", [1959.38])[0])

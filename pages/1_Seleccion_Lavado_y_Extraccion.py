@@ -288,8 +288,16 @@ with tab3:
         st.markdown("**Flujos másicos diario y horario:**")
         st.latex(r"\dot{m}_{i,\text{día}} = \frac{m_{i,\text{año}}}{D_{\text{campaña}}}")
         st.latex(r"\dot{m}_{i,\text{h}} = \frac{m_{i,\text{año}}}{H_{\text{anuales}}}")
-
-
-
+    with st.container(border=True):
+        st.markdown("**Rendimiento global de fruta recepcionada a jugo bruto:**")
+        st.latex(r"\eta_{\text{global}} = \left(\frac{m_{\text{jugo bruto}}}{m_{\text{recepción}}}\right) \times 100")
+    with st.container(border=True):
+        st.markdown("**Caudales horarios de enlace con el resto de la planta:**")
+        st.latex(r"\dot{m}_{\text{jugo bruto, h}} = \frac{m_{\text{jugo bruto}}}{H_{\text{anuales}}}") 
+        st.latex(r"\dot{m}_{\text{emulsión diluida, h}} = \frac{m_{\text{emulsión pura}} + m_{\text{agua ext}}}{H_{\text{anuales}}}") 
+        st.latex(r"\dot{m}_{\text{subproductos sólidos, h}} = \frac{m_{\text{piel y semillas}} + m_{\text{destrío 1}} + m_{\text{destrío 2}} + m_{\text{merma lavado}}}{H_{\text{anuales}}}")
+    with st.container(border=True):
+        st.markdown("**Simulación acumulada hora a hora en un turno:**")
+        st.latex(r"M_{i,\text{acum}}(h) = \dot{m}_{i,\text{h}} \times h")
 
 

@@ -44,7 +44,7 @@ with st.sidebar:
         cap_g = st.number_input("Capacidad tanque grande (L)", 0.0, value=c.cap_tanque_grande_l, step=1000.0)
         n_m = st.number_input("Nº tanques medianos", 0, 100, c.num_tanques_medianos)
         cap_m = st.number_input("Capacidad tanque mediano (L)", 0.0, value=c.cap_tanque_mediano_l, step=1000.0)
-        dens = st.number_input("Densidad zumo (kg/L)", 0.0, value=c.densidad_kg_l, step=0.001, format="%.3f")
+        dens = st.number_input("Densidad jugo (kg/L)", 0.0, value=c.densidad_kg_l, step=0.001, format="%.3f")
         q_in = st.number_input("Caudal entrada (L/día)", 0.0, value=c.caudal_entrada_l_dia, step=100.0)
         q_out = st.number_input("Caudal salida (L/día)", 0.0, value=c.caudal_salida_l_dia, step=100.0)
         d_env = st.number_input("Días de envasado al año", 0, 365, c.dias_envasado_anio)
@@ -95,7 +95,7 @@ with tab_ingreso:
         litros = st.number_input("Litros a ingresar", 0.0, value=float(config.caudal_entrada_l_dia), step=100.0)
         t_in = st.number_input("Temperatura de entrada (°C)", value=float(config.temp_operacion_c), step=0.1)
         if st.form_submit_button("Ingresar lote", type="primary"):
-            mostrar(planta.recibir_zumo(variedad, litros, t_in))
+            mostrar(planta.recibir_jugo(variedad, litros, t_in))
             st.rerun()
 
 # ---- Salida ---- #

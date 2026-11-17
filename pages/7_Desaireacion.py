@@ -2,17 +2,18 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-# Configuración del dashboard a pantalla completa
-st.set_page_config(
-    page_title="Módulo de Desaireación - Zumo de Naranja", 
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+try:
+    st.set_page_config(
+        page_title="Módulo de Desaireación - Zumo de Naranja",
+        layout="wide",
+        initial_sidebar_state="collapsed"
+    )
+except Exception:
+    pass
 
 # --- ESTILOS CSS CON TIPOGRAFÍA INSTITUCIONAL ---
 st.markdown("""
     <style>
-    /* Tipografía institucional en tamaños grandes */
     .inst-univ {
         font-family: Arial, sans-serif;
         font-size: 28px !important;
@@ -37,8 +38,6 @@ st.markdown("""
         color: #888888;
         margin-top: 2px;
     }
-    
-    /* Estilos generales del cuerpo */
     h2, h3, .stSubheader {
         font-family: Arial, sans-serif;
         font-size: 20px !important;
@@ -54,19 +53,19 @@ st.markdown("""
 def cargar_fuente(tamano):
     """Busca fuentes en Windows/Linux o escala la fuente por defecto para garantizar el tamaño"""
     rutas_fuentes = [
-        "arialbd.ttf",  # Arial Bold en Windows
-        "arial.ttf",    # Arial Regular en Windows
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", # Linux / Streamlit Cloud
+        "arialbd.ttf",
+        "arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
     ]
     for ruta in rutas_fuentes:
         try:
             return ImageFont.truetype(ruta, tamano)
-        except:
+        except Exception:
             continue
     try:
         return ImageFont.load_default(size=tamano)
-    except:
+    except Exception:
         return ImageFont.load_default()
 
 def generar_imagen_dinamica(presion, temperatura):
@@ -82,25 +81,21 @@ def generar_imagen_dinamica(presion, temperatura):
         font_numero = cargar_fuente(34)
         font_unidad = cargar_fuente(17)
             
-        # Display superior (Presión de Vacío)
         draw.text((552, 368), f"{presion:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
         draw.text((552, 398), "kPa", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
-        # Display inferior (Temperatura)
         draw.text((553, 466), f"{temperatura:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
         draw.text((553, 496), "°C", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
         return img
-    else:
-        return None
+    return None
 
 def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
     """
-    Función principal del módulo. 
+    Función principal del módulo.
     Permite recibir parámetros externos de módulos previos o usar valores interactivos locales.
     Retorna: (caudal_salida, oxigeno_salida) para alimentar al siguiente equipo.
     """
-    # --- ENCABEZADO INSTITUCIONAL CON LOGOS AMPLIADOS (180px) ---
     col_head_texto, col_logo1, col_logo2 = st.columns([4.2, 1.4, 1.4], gap="medium")
     
     with col_head_texto:
@@ -122,7 +117,6 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
             
     st.markdown("---")
     
-    # Diseño de 2 columnas principales (Izquierda: Controles y Cálculos | Derecha: Panel SCADA)
     col_inputs, col_results = st.columns([1.1, 0.9], gap="large")
     
     with col_inputs:
@@ -164,8 +158,7 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
             caudal_salida = 1958.40
             oxigeno_salida = 0.50
         else:
-            # --- VALIDACIONES FÍSICAS DE VIABILIDAD ---
-            temp_ebullicion_aprox = 35.0 + (presion_vacio * 1.5) 
+            temp_ebullicion_aprox = 35.0 + (presion_vacio * 1.5)
             
             if temp_entrada > temp_ebullicion_aprox and presion_vacio < 15.0:
                 st.error(f"❌ **Error Físico Inviable:** Con una presión de vacío de **{presion_vacio:.1f} kPa**, la temperatura de **{temp_entrada:.1f} °C** provocará una ebullición instantánea violenta (*flashing* prematuro).\n\n*Sugerencia:* Disminuye la temperatura de entrada o reduce el nivel de vacío.")
@@ -178,7 +171,6 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
             st.success("✅ Simulación calculada exitosamente bajo régimen estacionario.")
             st.markdown("---")
 
-            # 2. Cálculos y Balance de Materia
             st.subheader("2. Cálculos y Balance de Materia")
             
             eficiencia_remocion = min(98.0, max(85.0, 95.0 - (presion_vacio - 7.0) * 0.5))
@@ -188,9 +180,9 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
             caudal_salida = caudal_entrada - perdida_gases
             
             tiempo_residencia_min = 2.0
-            densidad_zumo = 1045.0  # kg/m^3
+            densidad_zumo = 1045.0
             volumen_util_litros = (caudal_entrada / densidad_zumo) * (tiempo_residencia_min / 60.0) * 1000.0
-            volumen_total_litros = volumen_util_litros / 0.35  # 35% de llenado
+            volumen_total_litros = volumen_util_litros / 0.35
             
             m1, m2, m3 = st.columns(3)
             m1.metric("Zumo Salida", f"{caudal_salida:.2f} kg/h")
@@ -199,7 +191,6 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
 
             st.markdown("---")
 
-            # 3. Comportamiento del Sistema / Tabla de Sensibilidad
             st.subheader("3. Comportamiento del Sistema")
             st.caption("Sensibilidad: Presión de Vacío vs. Oxígeno Residual")
             
@@ -208,4 +199,22 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
                 "| :--- | :--- | :--- |"
             ]
             presiones_sim = [3.0, 5.0, 7.0, 9.0, 12.0, 15.0, 20.0]
-            for p in pres
+            for p in presiones_sim:
+                ef = min(98.0, max(85.0, 95.0 - (p - 7.0) * 0.5))
+                o2_res = oxigeno_inicial * (1 - ef / 100.0)
+                lineas_tabla.append(f"| {p:.1f} | {ef:.1f}% | {o2_res:.2f} |")
+            
+            st.markdown("\n".join(lineas_tabla))
+
+    with col_results:
+        st.subheader("Panel SCADA - Vista en Vivo del Equipo")
+        img_dinamica = generar_imagen_dinamica(presion_vacio, temp_entrada)
+        if img_dinamica:
+            st.image(img_dinamica, caption=f"Telemetría Activa | Vacío: {presion_vacio:.1f} kPa | Temp: {temp_entrada:.1f} °C", use_container_width=True)
+        else:
+            st.warning("⚠️ No se encontró la imagen del equipo en la carpeta del proyecto.")
+            
+    return caudal_salida, oxigeno_salida
+
+if __name__ == "__main__":
+    run_desaireacion()

@@ -155,11 +155,67 @@ def render_streamlit():
     c3.metric("Reducción S. cerevisiae", f"{res['reducciones_log_levadura']} log10")
     c4.metric("Retención Vitamina C", f"{res['retencion_vit_c_pct']} %")
 
-    st.subheader("📊 Perfil Térmico y Sensibilidad")
-    st.line_chart([temp_in, res["temp_tras_regeneracion_c"], temp_past, temp_past, temp_out])
+    col_izq, col_der = st.columns(2)
+    with col_izq:
+        st.subheader("📊 Perfil Térmico del Proceso")
+        st.line_chart({
+            "Temperatura (°C)": [
+                temp_in,
+                res["temp_tras_regeneracion_c"],
+                temp_past,
+                temp_past,
+                temp_out,
+            ]
+        })
+
+    with col_der:
+        st.subheader("🔬 Sensibilidad: Vitamina C vs Temperatura")
+        temps_rango = list(range(70, 106, 5))
+        vit_rango = [
+            simular_pasteurizador(flujo_lh, brix_in, temp_in, t, tiempo_ret, temp_out, -4.0, regeneracion_pct)["retencion_vit_c_pct"]
+            for t in temps_rango
+        ]
+        st.line_chart(dict(zip(temps_rango, vit_rango)))
 
     st.subheader("⚖️ Validación contra Caso Base (6000 L/h, 90 °C, 20 s)")
-    st.json({"Simulacion_Actual": res, "Caso_Base_Planta": caso_base})
+    st.table({
+        "Variable": [
+            "Flujo másico (SI)",
+            "Calor específico Cp (SI)",
+            "Potencia calentamiento",
+            "Consumo de vapor",
+            "Potencia enfriamiento",
+            "Caudal agua glicolada (-4 °C)",
+            "Velocidad en tubos (Ø 2\")",
+            "Longitud celda retención",
+            "Reducción S. cerevisiae",
+            "Retención Vitamina C",
+        ],
+        "Caso Base": [
+            f"{caso_base['flujo_masico_out_kg_s']} kg/s",
+            f"{caso_base['cp_zumo_j_kgk']} J/(kg·K)",
+            f"{caso_base['potencia_calentamiento_kw']} kW",
+            f"{caso_base['flujo_vapor_kg_h']} kg/h",
+            f"{caso_base['potencia_enfriamiento_kw']} kW",
+            f"{caso_base['flujo_glicol_kg_h']} kg/h",
+            f"{caso_base['velocidad_tubo_m_s']} m/s",
+            f"{caso_base['longitud_celda_retencion_m']} m",
+            f"{caso_base['reducciones_log_levadura']} log10",
+            f"{caso_base['retencion_vit_c_pct']} %",
+        ],
+        "Simulación Actual": [
+            f"{res['flujo_masico_out_kg_s']} kg/s",
+            f"{res['cp_zumo_j_kgk']} J/(kg·K)",
+            f"{res['potencia_calentamiento_kw']} kW",
+            f"{res['flujo_vapor_kg_h']} kg/h",
+            f"{res['potencia_enfriamiento_kw']} kW",
+            f"{res['flujo_glicol_kg_h']} kg/h",
+            f"{res['velocidad_tubo_m_s']} m/s",
+            f"{res['longitud_celda_retencion_m']} m",
+            f"{res['reducciones_log_levadura']} log10",
+            f"{res['retencion_vit_c_pct']} %",
+        ],
+    })
 
 
 # =============================================================================

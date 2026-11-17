@@ -249,6 +249,8 @@ with tab2:
 # --- Pestaña 3 ---
 with tab3:
     st.subheader("Seleccion, Lavado y Extracción")
+    st.markdown(" ")
+    st.markdown("**Selección y Clasificación.** Esta operación preliminar tiene como objetivo garantizar la homogeneidad de la materia prima y evitar la contaminación de los lotes. El proceso inicia con una inspección visual y manual sobre bandas transportadoras de rodillos los cuales hacen girar la fruta para exponer toda su superficie con el fin de descartar naranjas podridas, dañadas mecánicamente o inmaduras. Posteriormente, la fruta pasa por clasificadores mecánicos (de rodillos divergentes o tambores perforados) que la agrupan por tamaño, asegurando que cada pieza se ajuste a las dimensiones exactas de los equipos de extracción. ")
     st.markdown("Para realizar la simulación de estos pasos unitarios se utilizó principalmente la bibliografía “Diseño y Dimensionamiento De Una Línea de Elaboración de Zumo De Naranja Con Capacidad De 1,500,000 litros/año En Palma Del Río, Córdoba” siendo una tesis de la universidad politécnica de madrid, en la cual nos plantea el proceso para producir jugo de naranja, además de utilizar este documento para realizar los cálculos de la selección, lavado y extracción se optó por el uso de dos principales uso de IA´s “Gemini IA y Claude”.")
     st.markdown("Se utilizaron las siguientes fórmulas:")
 

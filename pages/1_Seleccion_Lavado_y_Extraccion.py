@@ -251,7 +251,7 @@ with tab3:
     st.subheader("Seleccion, Lavado y Extacción")
     st.markdown("Para realizar la simulación de estos pasos unitarios se utilizó principalmente la bibliografía “Diseño y Dimensionamiento De Una Línea de Elaboración de Zumo De Naranja Con Capacidad De 1,500,000 litros/año En Palma Del Río, Córdoba” siendo una tesis de la universidad politécnica de madrid, en la cual nos plantea el proceso para producir jugo de naranja, además de utilizar este documento para realizar los cálculos de la selección, lavado y extracción se optó por el uso de dos principales uso de IA´s “Gemini IA y Claude”.")
     st.markdown("Se utilizaron las siguientes fórmulas: 
-Horas anuales de operación: )
+Horas anuales de operación: ")
 
 
 

@@ -281,7 +281,7 @@ with tab3:
         st.markdown("**Naranja apta requerida a la entrada de extracción:**")
         st.latex(r"m_{\text{naranja ext}} = \frac{m_{\text{jugo bruto}}}{\eta_{\text{ext}} / 100}") 
     with st.container(border=True):
-        st.markdown("**Subproducto sólido (piel, segmentos del fruto y semillas): **")
+        st.markdown("**Subproducto sólido (piel, segmentos del fruto y semillas):**")
         st.latex(r"m_{\text{piel y semillas}} = m_{\text{naranja ext}} \times \left(\frac{f_{\text{piel y semillas}}}{100}\right)")
     with st.container(border=True):
         st.markdown("**Agua auxiliar añadida en los extractores:**")

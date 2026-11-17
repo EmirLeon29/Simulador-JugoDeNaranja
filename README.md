@@ -1,4 +1,4 @@
-# 🍊 Balance de materia · Planta de zumo de naranja
+# 🍊 Balance de materia · Planta de Jugo de naranja
 
 Simulador interactivo (Streamlit) del balance de materia de una planta de zumo de naranja:
 selección, lavado, extracción y subproductos, con comparación contra la línea base.

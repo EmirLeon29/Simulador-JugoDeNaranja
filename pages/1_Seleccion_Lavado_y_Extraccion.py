@@ -253,10 +253,10 @@ with tab3:
     st.markdown("**Selección y Clasificación.** Esta operación preliminar tiene como objetivo garantizar la homogeneidad de la materia prima y evitar la contaminación de los lotes. El proceso inicia con una inspección visual y manual sobre bandas transportadoras de rodillos los cuales hacen girar la fruta para exponer toda su superficie con el fin de descartar naranjas podridas, dañadas mecánicamente o inmaduras. Posteriormente, la fruta pasa por clasificadores mecánicos (de rodillos divergentes o tambores perforados) que la agrupan por tamaño, asegurando que cada pieza se ajuste a las dimensiones exactas de los equipos de extracción. ")
     st.markdown(" ")
     st.markdown("**Lavado y Desinfección.** Para eliminar residuos de tierra, ceras, pesticidas y reducir la carga microbiana de la cáscara, la naranja se somete a un tratamiento combinado de acción física y química. Primero, ingresa a tinas de inmersión con agitación por inyección de aire que ablandan y desprenden la suciedad adherida. A continuación, avanza por túneles de lavado donde cepillos rotatorios de cerdas suaves (polipropileno o nylon) y aspersores de agua a presión limpian la epidermis sin dañarla. Simultáneamente, se aplican soluciones desinfectantes a base de hipoclorito de sodio o dióxido de cloro bajo parámetros controlados de concentración y tiempo de contacto, garantizando la inocuidad antes del exprimido.")
-    col1, col2, col3 = st.columns([3, 2, 3])
+col1, col2, col3 = st.columns([3, 2, 3])
 
-        with col2:
-        st.image("images/lavadodenaranja.webp", caption="Descripción", use_container_width=True)
+    with col2:
+    st.image("images/lavadodenaranja.webp", caption="Descripción", use_container_width=True)
     
     st.markdown(" ")
     st.markdown("**Extracción.** En esta etapa se separa la fase líquida (jugo y pulpa) de los componentes sólidos estructurales del fruto. Utilizando sistemas de extracción rotatoria, la naranja es seccionada por la mitad mediante cuchillas estacionarias y cada hemisferio es presionado contra cabezales giratorios acanalados que giran a velocidades controladas. Este diseño reproduce el principio del exprimido manual a nivel industrial, permitiendo regular la presión ejercida para obtener un alto rendimiento de jugo sin exprimir en exceso el albedo o el flavedo, evitando así el amargor y el exceso de aceites esenciales en el producto.")

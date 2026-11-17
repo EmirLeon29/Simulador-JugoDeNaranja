@@ -133,8 +133,8 @@ with tab_sim:
     if sim:
         a, b, c_, d = st.columns(4)
         a.metric("Pico de ocupación", f"{sim['pico_ocupacion_l']:,.0f} L", f"{sim['pico_ocupacion_pct']:.1f} %", delta_color="off")
-        b.metric("Zumo ingresado", f"{sim['total_ingresado_l']:,.0f} L")
-        c_.metric("Zumo envasado", f"{sim['total_envasado_l']:,.0f} L", f"{sim['jornadas_envasado']} jornadas", delta_color="off")
+        b.metric("Jugo ingresado", f"{sim['total_ingresado_l']:,.0f} L")
+        c_.metric("Jugo envasado", f"{sim['total_envasado_l']:,.0f} L", f"{sim['jornadas_envasado']} jornadas", delta_color="off")
         d.metric(f"Alertas > {config.dias_max_retencion} d", sim["alertas_caducidad"])
 
         hist = pd.DataFrame(sim["historial"]).set_index("dia")

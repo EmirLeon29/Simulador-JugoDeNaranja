@@ -1,4 +1,4 @@
-"""Página Streamlit - Almacén de tanques asépticos (todo en un solo archivo).
+  """Página Streamlit - Almacén de tanques asépticos (todo en un solo archivo).
 
 Un único almacén general de zumo de naranja (sin separar por variedad).
 Los valores por defecto salen del TFG (Anejo 2) y se pueden modificar en la barra lateral,
@@ -220,7 +220,7 @@ class PlantaTanquesAsepticos:
                 filas.append({"Tanque": t.id_tanque, **t.calcular_y_ejecutar_cip(long_tuberia_m)})
         return filas
 
-    def simular_campana_anual(self) -> Dict:
+    def simular_campana_anal(self) -> Dict:
         """Simula 365 días (día 1 = 1 de diciembre) sobre una planta NUEVA; no toca el estado actual.
 
         Ingreso: lunes a viernes durante los primeros 121 días (1 dic - 31 mar).

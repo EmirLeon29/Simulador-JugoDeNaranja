@@ -244,3 +244,12 @@ with tab2:
             }
         )
     st.dataframe(pd.DataFrame(filas_turno), hide_index=True, use_container_width=True)
+
+
+# --- Pestaña 3 ---
+with tab3:
+    st.subheader("Seleccion, Lavado y Extacción")
+
+
+
+    

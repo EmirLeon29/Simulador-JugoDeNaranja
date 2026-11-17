@@ -259,6 +259,10 @@ with tab3:
     
     st.markdown(" ")
     st.markdown("**Extracción.** En esta etapa se separa la fase líquida (jugo y pulpa) de los componentes sólidos estructurales del fruto. Utilizando sistemas de extracción rotatoria, la naranja es seccionada por la mitad mediante cuchillas estacionarias y cada hemisferio es presionado contra cabezales giratorios acanalados que giran a velocidades controladas. Este diseño reproduce el principio del exprimido manual a nivel industrial, permitiendo regular la presión ejercida para obtener un alto rendimiento de jugo sin exprimir en exceso el albedo o el flavedo, evitando así el amargor y el exceso de aceites esenciales en el producto.")
+    col1, col2, col3 = st.columns([3, 2, 3])
+    with col2:
+        st.image("images/exprimidor.jpg", use_container_width=True)
+    
     st.markdown(" ")
     st.markdown("<h3 style='text-align: center;'>Proceso de Simulación</h3>", unsafe_allow_html=True)
     st.markdown("Para realizar la simulación de estos pasos unitarios se utilizó principalmente la bibliografía “Diseño y Dimensionamiento De Una Línea de Elaboración de Zumo De Naranja Con Capacidad De 1,500,000 litros/año En Palma Del Río, Córdoba” siendo una tesis de la universidad politécnica de madrid, en la cual nos plantea el proceso para producir jugo de naranja, además de utilizar este documento para realizar los cálculos de la selección, lavado y extracción se optó por el uso de dos principales uso de IA´s “Gemini IA y Claude”.")

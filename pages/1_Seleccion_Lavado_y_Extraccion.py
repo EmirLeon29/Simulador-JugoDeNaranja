@@ -321,7 +321,6 @@ st.markdown(
     """
     Referencias.
     - Operaciones preliminares de acondicionamiento: Fellows, 2017; Ibarz & Barbosa-Cánovas, 2005.
-    
     -Funcionamiento de extractores rotatorios tipo Brown y control de aceites esenciales: Bates et al., 2001; Kimball, 1999. 
     """
 )

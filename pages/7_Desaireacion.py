@@ -51,13 +51,23 @@ def simular_desaireacion(
         "volumen_tanque": round(volumen_total_litros, 1),
     }
 
+def encontrar_archivo(nombre_base):
+    candidatos = [
+        nombre_base,
+        nombre_base + ".png",
+        nombre_base + ".jpg",
+        nombre_base + ".png.png",
+        nombre_base + ".jpg.jpg"
+    ]
+    for c in candidatos:
+        if os.path.exists(c):
+            return c
+    return None
+
 def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
-    """Estampa los valores de presión y temperatura sobre los displays de la imagen del equipo"""
-    img_path = "image_17.png"
-    if not os.path.exists(img_path):
-        img_path = "image_17.jpg"
+    img_path = encontrar_archivo("image_17")
         
-    if os.path.exists(img_path):
+    if img_path and os.path.exists(img_path):
         img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         try:
@@ -79,14 +89,14 @@ def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
     else:
         img = Image.new("RGB", (600, 800), color=(240, 240, 240))
         draw = ImageDraw.Draw(img)
-        draw.text((50, 50), "Imagen image_17.png no encontrada", fill=(255, 0, 0))
+        draw.text((50, 50), "Imagen image_17 no encontrada", fill=(255, 0, 0))
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
 
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS ROBUSTOS)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">
@@ -149,8 +159,8 @@ HTML_PAGINA = """<!DOCTYPE html>
             <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
         </div>
         <div class="logos-container">
-            <img src="/logo_unam.png" class="logo-img" alt="Logo UNAM">
-            <img src="/logo_fes.png" class="logo-img" alt="Logo FES Zaragoza">
+            <img src="/logo_unam" class="logo-img" alt="Logo UNAM">
+            <img src="/logo_fes" class="logo-img" alt="Logo FES Zaragoza">
         </div>
     </div>
 
@@ -277,20 +287,21 @@ class ManejadorDesaireacion(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(png_bytes)
 
-        elif path in ["/logo_unam.png", "/logo_fes.png", "/image_17.png"]:
-            filename = path[1:]
-            if os.path.exists(filename):
-                with open(filename, "rb") as f:
+        elif path in ["/logo_unam", "/logo_fes"]:
+            nombre_base = path[1:]
+            archivo_encontrado = encontrar_archivo(nombre_base)
+            if archivo_encontrado and os.path.exists(archivo_encontrado):
+                with open(archivo_encontrado, "rb") as f:
                     content = f.read()
                 self.send_response(200)
-                if filename.endswith(".png"):
+                if archivo_encontrado.endswith(".png") or archivo_encontrado.endswith(".png.png"):
                     self.send_header("Content-type", "image/png")
-                elif filename.endswith(".jpg") or filename.endswith(".jpeg"):
+                else:
                     self.send_header("Content-type", "image/jpeg")
                 self.end_headers()
                 self.wfile.write(content)
             else:
-                self.send_error(404, "Archivo no encontrado")
+                self.send_error(404, "Logo no encontrado")
 
         elif path == "/simular":
             caudal = float(qs.get("caudal", [1959.38])[0])
@@ -324,7 +335,7 @@ if __name__ == "__main__":
             servidor = socketserver.TCPServer(("", puerto), ManejadorDesaireacion)
             url = f"http://localhost:{puerto}"
             print(f"\n=== MÓDULO DE DESAIREACIÓN ACTIVO EN: {url} ===")
-            print("Abriendo automáticamente tu navegador web con diseño SCADA completo...")
+            print("Abriendo automáticamente tu navegador web...")
             threading.Timer(0.8, lambda u=url: webbrowser.open(u)).start()
             servidor.serve_forever()
             break

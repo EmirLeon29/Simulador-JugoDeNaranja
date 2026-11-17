@@ -261,5 +261,5 @@ with tab3:
         st.latex(r"V_{\text{h}} = \frac{V_{\text{anual}}}{D_{\text{anuales}}}")
     with st.container(border=True):
         st.markdown("**Flujo másico de zumo comercial (anual y diario):**")
-        st.latex(r"m_{\text{zumo comercial}} = V_{\text{anual}} \times \rho")
-        st.latex(r"m_{\text{zumo, día}} = \frac{m_{\text{zumo comercial}}}{D_{\text{campaña}}}")
+        st.latex(r"m_{\text{jugoo comercial}} = V_{\text{anual}} \times \rho")
+        st.latex(r"m_{\text{jugo, día}} = \frac{m_{\text{jugo comercial}}}{D_{\text{campaña}}}")

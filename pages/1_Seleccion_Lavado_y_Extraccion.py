@@ -255,6 +255,7 @@ with tab3:
 
 with col2:
     st.image("images/lavadodenaranja.webp", use_container_width=True)
+    
     st.markdown(" ")
     st.markdown("**Lavado y Desinfección.** Para eliminar residuos de tierra, ceras, pesticidas y reducir la carga microbiana de la cáscara, la naranja se somete a un tratamiento combinado de acción física y química. Primero, ingresa a tinas de inmersión con agitación por inyección de aire que ablandan y desprenden la suciedad adherida. A continuación, avanza por túneles de lavado donde cepillos rotatorios de cerdas suaves (polipropileno o nylon) y aspersores de agua a presión limpian la epidermis sin dañarla. Simultáneamente, se aplican soluciones desinfectantes a base de hipoclorito de sodio o dióxido de cloro bajo parámetros controlados de concentración y tiempo de contacto, garantizando la inocuidad antes del exprimido.")
     st.markdown(" ")

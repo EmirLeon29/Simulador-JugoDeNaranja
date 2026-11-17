@@ -7,6 +7,7 @@ selección, lavado, extracción y subproductos, con comparación contra la líne
 - Andrés Hernández Juan Pablo
 - Bringas Nova Marco Uriel
 - Escalante Pérez Sundhury Sinai
+- García Castillo Carlos Ulises
 - Hernández Medina Alondra 
 - León Salinas Emir Armando
 - Manzano Bermudez Armando Eduardo

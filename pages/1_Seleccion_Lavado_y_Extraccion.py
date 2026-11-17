@@ -299,7 +299,10 @@ with tab3:
     with st.container(border=True):
         st.markdown("**Simulación acumulada hora a hora en un turno:**")
         st.latex(r"M_{i,\text{acum}}(h) = \dot{m}_{i,\text{h}} \times h")
-st.markdown("En donde para la ia de Gemini IA se le dio el siguiente prompt.")
+        
+    st.markdown("En donde para la ia de Gemini IA se le dio el siguiente prompt.")
+    st.markdown("“Buen dia, señorita gemini ia, requiero de su ayuda para mi siguiente proyecto, necesito realizar un código en python de las operaciones de la Selección, Lavado y Extracción del proceso de jugo de naranja, necesito que este código pueda modificar unas variables de entrada que sean Producción de Jugo Comercial en litros/año, Días de Campaña Extracción en días/año, Horas por Turno en horas/día, Densidad del Jugo en kilogramos/litros, Pulpa Salida Extractor (%), Pulpa Jugo Comercial (%), Rendimiento por Sección (%), Rendimiento Lavado (%), Fracción Piel y Semillas (%), Fracción Emulsión Aceite (%), Agua por extractor (kg/h), Número de extractores (ud), recuerda que este código lo debo de correr en local en la app de Visual Code Studio para verificar y modificar el código en lo que requiera.”")
+
     
 
 

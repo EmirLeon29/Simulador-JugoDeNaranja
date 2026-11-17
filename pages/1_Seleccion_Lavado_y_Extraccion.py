@@ -259,6 +259,5 @@ st.markdown(
     """
     Horas anuales de operación:
     """
-st.latex(r"HAnuales = Dcampaña * HTurno")
 )
-    
+st.latex(r"HAnuales = Dcampaña * HTurno")

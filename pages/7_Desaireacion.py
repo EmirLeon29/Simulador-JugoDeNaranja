@@ -52,12 +52,16 @@ def simular_desaireacion(
     }
 
 def encontrar_archivo(nombre_base):
+    # Busca tanto en la raíz como dentro de la carpeta pages/
     candidatos = [
         nombre_base,
         nombre_base + ".png",
         nombre_base + ".jpg",
         nombre_base + ".png.png",
-        nombre_base + ".jpg.jpg"
+        os.path.join("pages", nombre_base),
+        os.path.join("pages", nombre_base + ".png"),
+        os.path.join("pages", nombre_base + ".jpg"),
+        os.path.join("pages", nombre_base + ".png.png")
     ]
     for c in candidatos:
         if os.path.exists(c):
@@ -89,14 +93,14 @@ def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
     else:
         img = Image.new("RGB", (600, 800), color=(240, 240, 240))
         draw = ImageDraw.Draw(img)
-        draw.text((50, 50), "Imagen image_17 no encontrada", fill=(255, 0, 0))
+        draw.text((50, 50), "Imagen image_17 no encontrada en pages/", fill=(255, 0, 0))
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
 
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS ROBUSTOS)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS EN PAGES)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">

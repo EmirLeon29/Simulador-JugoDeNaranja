@@ -1,293 +1,225 @@
-import math
-import json
-import http.server
-import socketserver
-import urllib.parse
-import webbrowser
-import threading
+import streamlit as st
+from PIL import Image, ImageDraw, ImageFont
+import os
 
-# =============================================================================
-# 1. MOTOR MATEMÁTICO EN UNIDADES SI (Módulo de Desaireación)
-# =============================================================================
-def simular_desaireacion(
-    caudal_entrada_lh: float = 1959.38,
-    presion_vacio_kpa: float = 7.0,
-    temp_entrada_c: float = 25.0,
-    oxigeno_inicial_ppm: float = 10.0,
-) -> dict:
-    temp_ebullicion_aprox = 35.0 + (presion_vacio_kpa * 1.5)
-    flash_inviable = (temp_entrada_c > temp_ebullicion_aprox) and (presion_vacio_kpa < 15.0)
-    error_oxigeno = oxigeno_inicial_ppm <= 0.1
+# Configuración del dashboard a pantalla completa y fondo blanco por defecto
+st.set_page_config(
+    page_title="Módulo de Desaireación - Zumo de Naranja", 
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-    if flash_inviable or error_oxigeno:
-        return {
-            "valido": False,
-            "error_msg": "❌ Error Físico Inviable: Temperatura muy alta para el nivel de vacío o oxígeno inválido."
-        }
-
-    eficiencia_remocion = min(98.0, max(85.0, 95.0 - (presion_vacio_kpa - 7.0) * 0.5))
-    oxigeno_salida = oxigeno_inicial_ppm * (1.0 - eficiencia_remocion / 100.0)
-    
-    perdida_gases = caudal_entrada_lh * 0.0005
-    caudal_salida = caudal_entrada_lh - perdida_gases
-
-    tiempo_residencia_min = 2.0
-    densidad_zumo = 1045.0  # kg/m^3
-    volumen_util_litros = (caudal_entrada_lh / densidad_zumo) * (tiempo_residencia_min / 60.0) * 1000.0
-    volumen_total_litros = volumen_util_litros / 0.35
-
-    return {
-        "valido": True,
-        "caudal_entrada": round(caudal_entrada_lh, 2),
-        "caudal_salida": round(caudal_salida, 2),
-        "oxigeno_inicial": round(oxigeno_inicial_ppm, 2),
-        "oxigeno_salida": round(oxigeno_salida, 2),
-        "eficiencia_remocion": round(eficiencia_remocion, 1),
-        "presion_vacio": round(presion_vacio_kpa, 1),
-        "temp_entrada": round(temp_entrada_c, 1),
-        "volumen_tanque": round(volumen_total_litros, 1),
-    }
-
-
-# =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA DIGITAL + AZUL CERÚLEO)
-# =============================================================================
-HTML_PAGINA = """<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Módulo de Desaireación - Zumo de Naranja</title>
+# --- ESTILOS CSS CON TIPOGRAFÍA Y DISEÑO INSTITUCIONAL ---
+st.markdown("""
     <style>
-        body { font-family: Arial, sans-serif; background: #f8fafc; margin: 0; padding: 0; color: #111111; }
-        
-        /* Franja superior en Azul Cerúleo institucional */
-        .header-banner {
-            background-color: #0092B2;
-            color: white;
-            padding: 22px 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .inst-univ { font-size: 25px; font-weight: bold; margin: 0; color: white; }
-        .inst-fac { font-size: 19px; font-weight: bold; margin: 4px 0; color: #fef08a; }
-        .mod-title { font-size: 15px; margin: 0; color: #e0f2fe; }
-        
-        .badge-unam { 
-            background: white; 
-            color: #0092B2; 
-            padding: 10px 18px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 15px; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            letter-spacing: 1px;
-        }
-
-        .main-container { padding: 30px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; max-width: 1600px; margin: auto; }
-        .card { background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        
-        h3 { color: #0092B2; font-size: 19px; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
-        
-        .slider-group { margin-bottom: 18px; }
-        .slider-group label { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 6px; color: #1e293b; }
-        .slider-group input[type=range] { width: 100%; accent-color: #0092B2; height: 6px; }
-        
-        .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
-        .kpi { background: #f0f9ff; border-left: 5px solid #0092B2; padding: 12px; border-radius: 8px; }
-        .kpi .titulo { font-size: 12px; color: #475569; font-weight: bold; }
-        .kpi .valor { font-size: 18px; font-weight: bold; color: #0092B2; margin-top: 4px; }
-        
-        .alerta { padding: 14px; border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-align: center; }
-        .seguro { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .peligro { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: center; }
-        th { background: #e0f2fe; color: #0092B2; font-weight: bold; }
-
-        /* Panel SCADA digital profesional */
-        .scada-panel { background: #0f172a; color: #38bdf8; padding: 25px; border-radius: 10px; font-family: monospace; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
-        .scada-screen { background: #020617; border: 2px solid #38bdf8; padding: 20px; border-radius: 8px; margin-top: 15px; }
-        .scada-row { display: flex; justify-content: space-between; margin: 12px 0; font-size: 16px; border-bottom: 1px dashed #1e293b; padding-bottom: 8px; }
-        .scada-label { color: #94a3b8; }
-        .scada-val { color: #4ade80; font-weight: bold; font-size: 18px; }
+    /* Forzar fondo blanco puro en toda la aplicación */
+    .stApp {
+        background-color: #FFFFFF;
+        color: #111111;
+    }
+    
+    /* Tipografía institucional en tamaños grandes */
+    .inst-univ {
+        font-family: Arial, sans-serif;
+        font-size: 28px !important;
+        font-weight: bold;
+        color: #1b365d;
+        margin-bottom: 2px;
+        line-height: 1.1;
+    }
+    .inst-fac {
+        font-family: Arial, sans-serif;
+        font-size: 22px !important;
+        font-weight: bold;
+        color: #b38f00;
+        margin-top: 2px;
+        margin-bottom: 6px;
+        line-height: 1.2;
+    }
+    .mod-title {
+        font-family: Arial, sans-serif;
+        font-size: 18px !important;
+        font-weight: normal;
+        color: #555555;
+        margin-top: 2px;
+    }
+    
+    /* Estilos generales del cuerpo */
+    h2, h3, .stSubheader {
+        font-family: Arial, sans-serif;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        color: #1b365d !important;
+    }
+    p, label, .stCaption {
+        font-family: Arial, sans-serif;
+        font-size: 15px !important;
+    }
     </style>
-</head>
-<body>
-    <!-- Franja Superior en Azul Cerúleo -->
-    <div class="header-banner">
-        <div>
-            <p class="inst-univ">Universidad Nacional Autónoma de México</p>
-            <p class="inst-fac">Facultad de Estudios Superiores Zaragoza</p>
-            <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
-        </div>
-        <div class="badge-unam">
-            UNAM • FES ZARAGOZA
-        </div>
-    </div>
+""", unsafe_allow_html=True)
 
-    <!-- Contenido Principal -->
-    <div class="main-container">
-        <!-- Columna Izquierda: Parámetros y Cálculos -->
-        <div class="card">
-            <h3>1. Parámetros de Entrada</h3>
-            <div class="slider-group">
-                <label><span>Caudal de Zumo de Entrada (kg/h):</span> <span id="val_caudal">1959.38</span></label>
-                <input type="range" id="caudal" min="500" max="5000" step="10.0" value="1959.38" oninput="actualizar()">
-            </div>
-            <div class="slider-group">
-                <label><span>Presión de Vacío en la Cámara (kPa):</span> <span id="val_presion">7.0</span></label>
-                <input type="range" id="presion" min="3.0" max="50.0" step="0.5" value="7.0" oninput="actualizar()">
-            </div>
-            <div class="slider-group">
-                <label><span>Temperatura de Entrada (°C):</span> <span id="val_temp">25.0</span></label>
-                <input type="range" id="temp" min="10.0" max="90.0" step="1.0" value="25.0" oninput="actualizar()">
-            </div>
-            <div class="slider-group">
-                <label><span>Oxígeno Disuelto Inicial (mg/L):</span> <span id="val_o2">10.0</span></label>
-                <input type="range" id="o2" min="5.0" max="25.0" step="0.5" value="10.0" oninput="actualizar()">
-            </div>
-
-            <div id="estado_alerta" class="alerta seguro">✅ Simulación calculada exitosamente bajo régimen estacionario.</div>
-
-            <h3>2. Cálculos y Balance de Materia</h3>
-            <div class="kpis">
-                <div class="kpi"><div class="titulo">Zumo Salida</div><div class="valor" id="kpi_zumo">-</div></div>
-                <div class="kpi"><div class="titulo">O₂ Residual</div><div class="valor" id="kpi_o2res">-</div></div>
-                <div class="kpi"><div class="titulo">Vol. Tanque</div><div class="valor" id="kpi_vol">-</div></div>
-            </div>
-
-            <h3 style="margin-top: 25px;">3. Comportamiento del Sistema</h3>
-            <table>
-                <thead>
-                    <tr><th>Presión (kPa)</th><th>Eficiencia (%)</th><th>O₂ Residual (mg/L)</th></tr>
-                </thead>
-                <tbody id="tabla_sensibilidad">
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Columna Derecha: Panel SCADA Digital en Vivo -->
-        <div class="card">
-            <h3>Panel SCADA - Telemetría del Equipo</h3>
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">Modelo DV-100-S | Estado del Sistema en Tiempo Real</p>
+def generar_imagen_dinamica(presion, temperatura):
+    """Estampa los valores de presión y temperatura centrados en los displays de la imagen"""
+    img_path = "image_17.png"
+    if not os.path.exists(img_path):
+        img_path = "image_17.jpg"
+        
+    if os.path.exists(img_path):
+        img = Image.open(img_path).convert("RGB")
+        draw = ImageDraw.Draw(img)
+        
+        try:
+            font_numero = ImageFont.truetype("arial.ttf", 28)
+            font_unidad = ImageFont.truetype("arial.ttf", 15)
+        except:
+            font_numero = ImageFont.load_default()
+            font_unidad = ImageFont.load_default()
             
-            <div class="scada-panel">
-                <div style="font-size: 14px; color: #facc15; font-weight: bold; margin-bottom: 5px;">⚡ PLC HMI - DESAIREADOR INDUSTRIAL</div>
-                <div class="scada-screen">
-                    <div class="scada-row"><span class="scada-label">ESTADO:</span> <span class="scada-val" style="color:#4ade80;">OPERATIVO</span></div>
-                    <div class="scada-row"><span class="scada-label">PRESIÓN CÁMARA:</span> <span class="scada-val" id="scada_presion">7.0 kPa</span></div>
-                    <div class="scada-row"><span class="scada-label">TEMP. ENTRADA:</span> <span class="scada-val" id="scada_temp">25.0 °C</span></div>
-                    <div class="scada-row"><span class="scada-label">EFICIENCIA VACÍO:</span> <span class="scada-val" id="scada_ef">95.0 %</span></div>
-                    <div class="scada-row"><span class="scada-label">CAUDAL SALIDA:</span> <span class="scada-val" id="scada_zumo">-</span></div>
-                    <div class="scada-row"><span class="scada-label">OXÍGENO RESIDUAL:</span> <span class="scada-val" id="scada_o2">-</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
+        # Coordenadas exactas centradas de los recuadros de la imagen
+        draw.text((552, 370), f"{presion:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
+        draw.text((552, 397), "kPa", fill=(70, 70, 70), font=font_unidad, anchor="mm")
+        
+        draw.text((553, 468), f"{temperatura:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
+        draw.text((553, 495), "°C", fill=(70, 70, 70), font=font_unidad, anchor="mm")
+        
+        return img
+    else:
+        return None
 
-    <script>
-        async function actualizar() {
-            const caudal = parseFloat(document.getElementById('caudal').value);
-            const presion = parseFloat(document.getElementById('presion').value);
-            const temp = parseFloat(document.getElementById('temp').value);
-            const o2 = parseFloat(document.getElementById('o2').value);
-
-            document.getElementById('val_caudal').innerText = caudal.toFixed(2);
-            document.getElementById('val_presion').innerText = presion.toFixed(1);
-            document.getElementById('val_temp').innerText = temp.toFixed(1);
-            document.getElementById('val_o2').innerText = o2.toFixed(1);
-
-            const resp = await fetch(`/simular?caudal=${caudal}&presion=${presion}&temp=${temp}&o2=${o2}`);
-            const data = await resp.json();
-
-            const alerta = document.getElementById('estado_alerta');
-            if (!data.actual.valido) {
-                alerta.className = "alerta peligro";
-                alerta.innerText = data.actual.error_msg;
-                return;
-            } else {
-                alerta.className = "alerta seguro";
-                alerta.innerText = "✅ Simulación calculada exitosamente bajo régimen estacionario.";
-            }
-
-            const r = data.actual;
-            document.getElementById('kpi_zumo').innerText = r.caudal_salida.toFixed(2) + " kg/h";
-            document.getElementById('kpi_o2res').innerText = r.oxigeno_salida.toFixed(2) + " mg/L";
-            document.getElementById('kpi_vol').innerText = r.volumen_tanque.toFixed(1) + " L";
-
-            // Actualiza pantallas del SCADA digital
-            document.getElementById('scada_presion').innerText = presion.toFixed(1) + " kPa";
-            document.getElementById('scada_temp').innerText = temp.toFixed(1) + " °C";
-            document.getElementById('scada_ef').innerText = r.eficiencia_remocion.toFixed(1) + " %";
-            document.getElementById('scada_zumo').innerText = r.caudal_salida.toFixed(2) + " kg/h";
-            document.getElementById('scada_o2').innerText = r.oxigeno_salida.toFixed(2) + " mg/L";
-
-            let filas = "";
-            data.tabla.forEach(row => {
-                filas += `<tr><td>${row.p.toFixed(1)}</td><td>${row.ef.toFixed(1)}%</td><td>${row.o2.toFixed(2)}</td></tr>`;
-            });
-            document.getElementById('tabla_sensibilidad').innerHTML = filas;
-        }
-        window.onload = actualizar;
-    </script>
-</body>
-</html>
-"""
-
-
-class ManejadorDesaireacion(http.server.BaseHTTPRequestHandler):
-    def log_message(self, format, *args):
-        pass
-
-    def do_GET(self):
-        parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
-        qs = urllib.parse.parse_qs(parsed.query)
-
-        if path == "/":
-            self.send_response(200)
-            self.send_header("Content-type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(HTML_PAGINA.encode("utf-8"))
-
-        elif path == "/simular":
-            caudal = float(qs.get("caudal", [1959.38])[0])
-            presion = float(qs.get("presion", [7.0])[0])
-            temp = float(qs.get("temp", [25.0])[0])
-            o2 = float(qs.get("o2", [10.0])[0])
-
-            actual = simular_desaireacion(caudal, presion, temp, o2)
+def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
+    """
+    Función principal del módulo. 
+    Permite recibir parámetros externos de módulos previos o usar valores interactivos locales.
+    Retorna: (caudal_salida, oxigeno_salida) para alimentar al siguiente equipo.
+    """
+    # --- ENCABEZADO INSTITUCIONAL CON LOGOS AMPLIADOS (180px) ---
+    col_head_texto, col_logo1, col_logo2 = st.columns([4.2, 1.4, 1.4], gap="medium")
+    
+    with col_head_texto:
+        st.markdown('<p class="inst-univ">Universidad Nacional Autónoma de México</p>', unsafe_allow_html=True)
+        st.markdown('<p class="inst-fac">Facultad de Estudios Superiores Zaragoza</p>', unsafe_allow_html=True)
+        st.markdown('<p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>', unsafe_allow_html=True)
+        
+    with col_logo1:
+        if os.path.exists("logo_unam.png"):
+            st.image("logo_unam.png", width=180)
+        elif os.path.exists("logo_unam.png.png"):
+            st.image("logo_unam.png.png", width=180)
             
-            tabla = []
+    with col_logo2:
+        if os.path.exists("logo_fes.png"):
+            st.image("logo_fes.png", width=180)
+        elif os.path.exists("logo_fes.png.png"):
+            st.image("logo_fes.png.png", width=180)
+            
+    st.markdown("---")
+    
+    # Diseño de 2 columnas principales (Izquierda: Controles y Cálculos | Derecha: Panel SCADA)
+    col_inputs, col_results = st.columns([1.1, 0.9], gap="large")
+    
+    with col_inputs:
+        st.subheader("1. Parámetros de Entrada")
+        
+        # Si recibe datos externos de un compañero, los toma automáticamente; si no, usa los sliders locales
+        if caudal_ext is not None:
+            st.info(f"🔗 **Conectado al tren de proceso:** Recibiendo caudal de corriente anterior.")
+            caudal_entrada = caudal_ext
+            st.metric("Caudal de Zumo Recibido (kg/h)", f"{caudal_entrada:.2f}")
+        else:
+            caudal_entrada = st.number_input("Caudal de Zumo de Entrada (kg/h)", value=1959.38, step=10.0)
+            
+        presion_vacio = st.slider("Presión de Vacío en la Cámara (kPa)", min_value=3.0, max_value=50.0, value=7.0, step=0.5)
+        
+        if temp_ext is not None:
+            temp_entrada = temp_ext
+            st.metric("Temperatura de Entrada Recibida (°C)", f"{temp_entrada:.1f}")
+        else:
+            temp_entrada = st.slider("Temperatura de Entrada del Zumo (°C)", min_value=10.0, max_value=90.0, value=25.0, step=1.0)
+            
+        if oxigeno_ext is not None:
+            oxigeno_inicial = oxigeno_ext
+            st.metric("Oxígeno Disuelto Inicial Recibido (mg/L)", f"{oxigeno_inicial:.2f}")
+        else:
+            oxigeno_inicial = st.slider("Oxígeno Disuelto Inicial (mg/L o ppm)", min_value=5.0, max_value=25.0, value=10.0, step=0.5)
+        
+        st.markdown("---")
+        
+        # Si está conectado en red, se puede forzar cálculo automático o mantener el botón
+        btn_iniciar = st.button("🚀 Iniciar Simulación y Balance", type="primary", use_container_width=True)
+        
+        if "simulacion_activa" not in st.session_state:
+            st.session_state.simulacion_activa = False
+            
+        # Si viene conectado externamente, podemos activar el cálculo automático de inmediato
+        if btn_iniciar or (caudal_ext is not None):
+            st.session_state.simulacion_activa = True
+
+        if not st.session_state.simulacion_activa:
+            st.info("💡 Configura tus parámetros arriba y haz clic en **'Iniciar Simulación y Balance'** para desplegar los cálculos y la tabla analítica en este espacio.")
+            caudal_salida = 1958.40
+            oxigeno_salida = 0.50
+        else:
+            # --- VALIDACIONES FÍSICAS DE VIABILIDAD ---
+            temp_ebullicion_aprox = 35.0 + (presion_vacio * 1.5) 
+            
+            if temp_entrada > temp_ebullicion_aprox and presion_vacio < 15.0:
+                st.error(f"❌ **Error Físico Inviable:** Con una presión de vacío de **{presion_vacio:.1f} kPa**, la temperatura de **{temp_entrada:.1f} °C** provocará una ebullición instantánea violenta (*flashing* prematuro).\n\n*Sugerencia:* Disminuye la temperatura de entrada o reduce el nivel de vacío.")
+                return 0.0, 0.0
+            
+            if oxigeno_inicial <= 0.1:
+                st.error("❌ **Error Físico Inviable:** El valor de oxígeno disuelto inicial no puede ser cero o negativo.")
+                return 0.0, 0.0
+
+            st.success("✅ Simulación calculada exitosamente bajo régimen estacionario.")
+            st.markdown("---")
+
+            # 2. Cálculos y Balance de Materia
+            st.subheader("2. Cálculos y Balance de Materia")
+            
+            eficiencia_remocion = min(98.0, max(85.0, 95.0 - (presion_vacio - 7.0) * 0.5))
+            oxigeno_salida = oxigeno_inicial * (1 - eficiencia_remocion / 100.0)
+            
+            perdida_gases = caudal_entrada * 0.0005
+            caudal_salida = caudal_entrada - perdida_gases
+            
+            tiempo_residencia_min = 2.0
+            densidad_zumo = 1045.0  # kg/m^3
+            volumen_util_litros = (caudal_entrada / densidad_zumo) * (tiempo_residencia_min / 60.0) * 1000.0
+            volumen_total_litros = volumen_util_litros / 0.35  # 35% de llenado
+            
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Zumo Salida", f"{caudal_salida:.2f} kg/h")
+            m2.metric("O₂ Residual", f"{oxigeno_salida:.2f} mg/L", f"-{eficiencia_remocion:.1f}%")
+            m3.metric("Vol. Tanque", f"{volumen_total_litros:.1f} L")
+
+            st.markdown("---")
+
+            # 3. Comportamiento del Sistema / Tabla de Sensibilidad
+            st.subheader("3. Comportamiento del Sistema")
+            st.caption("Sensibilidad: Presión de Vacío vs. Oxígeno Residual")
+            
+            lineas_tabla = [
+                "| Presión (kPa) | Efic. (%) | O₂ Res. (mg/L) |",
+                "| :--- | :--- | :--- |"
+            ]
             presiones_sim = [3.0, 5.0, 7.0, 9.0, 12.0, 15.0, 20.0]
             for p in presiones_sim:
                 ef = min(98.0, max(85.0, 95.0 - (p - 7.0) * 0.5))
-                o2_res = o2 * (1.0 - ef / 100.0)
-                tabla.append({"p": p, "ef": ef, "o2": o2_res})
+                o2_res = oxigeno_inicial * (1 - ef / 100.0)
+                lineas_tabla.append(f"| {p:.1f} | {ef:.1f}% | {o2_res:.2f} |")
+            
+            st.markdown("\n".join(lineas_tabla))
 
-            self.send_response(200)
-            self.send_header("Content-type", "application/json")
-            self.end_headers()
-            self.wfile.write(
-                json.dumps({"actual": actual, "tabla": tabla}).encode("utf-8")
-            )
+    # Columna Derecha: Panel SCADA (Imagen interactiva)
+    with col_results:
+        st.subheader("Panel SCADA - Vista en Vivo del Equipo")
+        img_dinamica = generar_imagen_dinamica(presion_vacio, temp_entrada)
+        if img_dinamica:
+            st.image(img_dinamica, caption=f"Telemetría Activa | Vacío: {presion_vacio:.1f} kPa | Temp: {temp_entrada:.1f} °C", use_container_width=True)
         else:
-            self.send_error(404, "No encontrado")
-
+            st.warning("⚠️ No se encontró la imagen del equipo en la carpeta del proyecto.")
+            
+    return caudal_salida, oxigeno_salida
 
 if __name__ == "__main__":
-    socketserver.TCPServer.allow_reuse_address = True
-    for puerto in range(8070, 8085):
-        try:
-            servidor = socketserver.TCPServer(("", puerto), ManejadorDesaireacion)
-            url = f"http://localhost:{puerto}"
-            print(f"\n=== MÓDULO DE DESAIREACIÓN ACTIVO EN: {url} ===")
-            print("Abriendo automáticamente tu navegador web...")
-            threading.Timer(0.8, lambda u=url: webbrowser.open(u)).start()
-            servidor.serve_forever()
-            break
-        except OSError:
-            continue
+    run_desaireacion()

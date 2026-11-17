@@ -5,9 +5,13 @@ selección, lavado, extracción y subproductos, con comparación contra la líne
 
 ## Colaboradores
 - Andrés Hernández Juan Pablo
+- Bringas Nova Marco Uriel
 - Escalante Pérez Sundhury Sinai
 - León Salinas Emir Armando
 - Manzano Bermudez Armando Eduardo
+- Montiel Hernández Edson Jared
+- Rivera Hernández Valeria Ameli
+- Silva Espinosa Nadia
 
 ## Estructura
 

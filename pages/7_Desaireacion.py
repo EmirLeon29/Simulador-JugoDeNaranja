@@ -64,15 +64,34 @@ st.markdown("""
         color: #1b365d !important;
     }
 
-    /* Mantener texto blanco únicamente dentro del botón principal rojo */
-    button[kind="primary"] p {
+    /* Mantener texto blanco en botones primarios y cuadros de alerta oscuros */
+    button[kind="primary"] p,
+    div[data-testid="stAlert"] p {
         color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
+def cargar_fuente(tamano):
+    """Busca fuentes en Windows/Linux o escala la fuente por defecto para garantizar el tamaño"""
+    rutas_fuentes = [
+        "arialbd.ttf",  # Arial Bold en Windows
+        "arial.ttf",    # Arial Regular en Windows
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", # Linux / Streamlit Cloud
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
+    ]
+    for ruta in rutas_fuentes:
+        try:
+            return ImageFont.truetype(ruta, tamano)
+        except:
+            continue
+    try:
+        return ImageFont.load_default(size=tamano)
+    except:
+        return ImageFont.load_default()
+
 def generar_imagen_dinamica(presion, temperatura):
-    """Estampa los valores de presión y temperatura centrados en los displays de la imagen"""
+    """Estampa los valores de presión y temperatura en gran tamaño en los displays verdes"""
     img_path = "image_17.png"
     if not os.path.exists(img_path):
         img_path = "image_17.jpg"
@@ -81,19 +100,17 @@ def generar_imagen_dinamica(presion, temperatura):
         img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         
-        try:
-            font_numero = ImageFont.truetype("arial.ttf", 28)
-            font_unidad = ImageFont.truetype("arial.ttf", 15)
-        except:
-            font_numero = ImageFont.load_default()
-            font_unidad = ImageFont.load_default()
+        # Tamaños ampliados significativamente para llenar los displays verdes
+        font_numero = cargar_fuente(46)
+        font_unidad = cargar_fuente(22)
             
-        # Coordenadas exactas centradas de los recuadros de la imagen
-        draw.text((552, 370), f"{presion:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((552, 397), "kPa", fill=(70, 70, 70), font=font_unidad, anchor="mm")
+        # Display superior (Presión de Vacío)
+        draw.text((552, 366), f"{presion:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
+        draw.text((552, 403), "kPa", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
-        draw.text((553, 468), f"{temperatura:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((553, 495), "°C", fill=(70, 70, 70), font=font_unidad, anchor="mm")
+        # Display inferior (Temperatura)
+        draw.text((553, 464), f"{temperatura:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
+        draw.text((553, 501), "°C", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
         return img
     else:
@@ -133,7 +150,6 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
     with col_inputs:
         st.subheader("1. Parámetros de Entrada")
         
-        # Si recibe datos externos de un compañero, los toma automáticamente; si no, usa los sliders locales
         if caudal_ext is not None:
             st.info("🔗 **Conectado al tren de proceso:** Recibiendo caudal de corriente anterior.")
             caudal_entrada = caudal_ext
@@ -157,13 +173,11 @@ def run_desaireacion(caudal_ext=None, temp_ext=None, oxigeno_ext=None):
         
         st.markdown("---")
         
-        # Si está conectado en red, se puede forzar cálculo automático o mantener el botón
         btn_iniciar = st.button("🚀 Iniciar Simulación y Balance", type="primary", use_container_width=True)
         
         if "simulacion_activa" not in st.session_state:
             st.session_state.simulacion_activa = False
             
-        # Si viene conectado externamente, podemos activar el cálculo automático de inmediato
         if btn_iniciar or (caudal_ext is not None):
             st.session_state.simulacion_activa = True
 

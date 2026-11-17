@@ -91,7 +91,7 @@ def cargar_fuente(tamano):
         return ImageFont.load_default()
 
 def generar_imagen_dinamica(presion, temperatura):
-    """Estampa los valores de presión y temperatura en gran tamaño en los displays verdes"""
+    """Estampa los valores de presión y temperatura en tamaño equilibrado dentro de los displays verdes"""
     img_path = "image_17.png"
     if not os.path.exists(img_path):
         img_path = "image_17.jpg"
@@ -100,17 +100,17 @@ def generar_imagen_dinamica(presion, temperatura):
         img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         
-        # Tamaños ampliados significativamente para llenar los displays verdes
-        font_numero = cargar_fuente(46)
-        font_unidad = cargar_fuente(22)
+        # Tamaño intermedio ideal para que respire dentro de los recuadros verdes
+        font_numero = cargar_fuente(34)
+        font_unidad = cargar_fuente(17)
             
         # Display superior (Presión de Vacío)
-        draw.text((552, 366), f"{presion:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
-        draw.text((552, 403), "kPa", fill=(45, 55, 45), font=font_unidad, anchor="mm")
+        draw.text((552, 368), f"{presion:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
+        draw.text((552, 398), "kPa", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
         # Display inferior (Temperatura)
-        draw.text((553, 464), f"{temperatura:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
-        draw.text((553, 501), "°C", fill=(45, 55, 45), font=font_unidad, anchor="mm")
+        draw.text((553, 466), f"{temperatura:4.1f}", fill=(15, 25, 15), font=font_numero, anchor="mm")
+        draw.text((553, 496), "°C", fill=(45, 55, 45), font=font_unidad, anchor="mm")
         
         return img
     else:

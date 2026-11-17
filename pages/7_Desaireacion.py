@@ -5,12 +5,8 @@ import socketserver
 import urllib.parse
 import webbrowser
 import threading
-import os
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
-
-# Directorio base para buscar la imagen local del SCADA si existe
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =============================================================================
 # 1. MOTOR MATEMÁTICO EN UNIDADES SI (Módulo de Desaireación)
@@ -21,6 +17,9 @@ def simular_desaireacion(
     temp_entrada_c: float = 25.0,
     oxigeno_inicial_ppm: float = 10.0,
 ) -> dict:
+    """
+    Simula el equipo de desaireación industrial bajo vacío para zumo de naranja.
+    """
     temp_ebullicion_aprox = 35.0 + (presion_vacio_kpa * 1.5)
     flash_inviable = (temp_entrada_c > temp_ebullicion_aprox) and (presion_vacio_kpa < 15.0)
     error_oxigeno = oxigeno_inicial_ppm <= 0.1
@@ -28,7 +27,7 @@ def simular_desaireacion(
     if flash_inviable or error_oxigeno:
         return {
             "valido": False,
-            "error_msg": "❌ Error Físico Inviable: Temperatura muy alta para el nivel de vacío o oxígeno inválido."
+            "error_msg": "❌ Error Físico Inviable: Temperatura muy alta para el nivel de vacío (riesgo de flashing violento) o oxígeno inválido."
         }
 
     eficiencia_remocion = min(98.0, max(85.0, 95.0 - (presion_vacio_kpa - 7.0) * 0.5))
@@ -55,51 +54,51 @@ def simular_desaireacion(
     }
 
 def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
-    """Busca la imagen local image_17.png en la carpeta y estampa la telemetría"""
-    candidatos = [
-        os.path.join(BASE_DIR, "image_17.png"),
-        os.path.join(BASE_DIR, "image_17.jpg"),
-        "image_17.png",
-        "image_17.jpg"
-    ]
+    """Genera dinámicamente el diagrama SCADA del desaireador con telemetría en vivo"""
+    img = Image.new("RGB", (700, 500), color=(248, 250, 252))
+    draw = ImageDraw.Draw(img)
     
-    img_path = None
-    for c in candidatos:
-        if os.path.exists(c):
-            img_path = c
-            break
-            
-    if img_path:
-        img = Image.open(img_path).convert("RGB")
-        draw = ImageDraw.Draw(img)
-        try:
-            font_numero = ImageFont.truetype("arial.ttf", 28)
-            font_unidad = ImageFont.truetype("arial.ttf", 15)
-        except:
-            font_numero = ImageFont.load_default()
-            font_unidad = ImageFont.load_default()
-            
-        draw.text((552, 370), f"{presion:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((552, 397), "kPa", fill=(70, 70, 70), font=font_unidad, anchor="mm")
-        
-        draw.text((553, 468), f"{temperatura:4.1f}", fill=(20, 20, 20), font=font_numero, anchor="mm")
-        draw.text((553, 495), "°C", fill=(70, 70, 70), font=font_unidad, anchor="mm")
-        
-        buf = BytesIO()
-        img.save(buf, format="PNG")
-        return buf.getvalue()
-    else:
-        # Lienzo de respaldo si falta la imagen image_17
-        img = Image.new("RGB", (600, 800), color=(240, 240, 240))
-        draw = ImageDraw.Draw(img)
-        draw.text((30, 50), "Coloca 'image_17.png' en la carpeta pages/", fill=(255, 0, 0))
-        buf = BytesIO()
-        img.save(buf, format="PNG")
-        return buf.getvalue()
+    try:
+        font_titulo = ImageFont.truetype("arial.ttf", 18)
+        font_texto = ImageFont.truetype("arial.ttf", 15)
+        font_display = ImageFont.truetype("arial.ttf", 16)
+    except:
+        font_titulo = ImageFont.load_default()
+        font_texto = ImageFont.load_default()
+        font_display = ImageFont.load_default()
+
+    # Estanque cilíndrico de acero inoxidable (Cuerpo principal)
+    draw.rectangle([200, 100, 480, 420], outline="#64748b", width=4, fill="#e2e8f0")
+    # Tapa superior e inferior redondeadas
+    draw.ellipse([200, 75, 480, 125], outline="#64748b", width=4, fill="#cbd5e1")
+    draw.ellipse([200, 395, 480, 445], outline="#64748b", width=4, fill="#cbd5e1")
+    
+    # Mirilla central (Nivel de zumo)
+    draw.rectangle([280, 180, 400, 340], outline="#334155", width=3, fill="#f97316")
+    draw.text((305, 250), "ZUMO EN\nVACIADO", fill="#ffffff", font=font_texto)
+
+    # Motor superior de vacío
+    draw.rectangle([305, 30, 375, 75], outline="#475569", width=3, fill="#94a3b8")
+    draw.text((315, 45), "MOTOR", fill="#1e293b", font=font_texto)
+
+    # Panel de control lateral (Displays SCADA)
+    draw.rectangle([510, 140, 670, 290], outline="#0092B2", width=3, fill="#ffffff")
+    draw.text((530, 155), "PANEL SCADA", fill="#0092B2", font=font_titulo)
+    draw.line([520, 180, 660, 180], fill="#0092B2", width=2)
+    
+    draw.text((525, 200), f"Vacío: {presion:.1f} kPa", fill="#1e293b", font=font_display)
+    draw.text((525, 240), f"Temp:  {temperatura:.1f} °C", fill="#1e293b", font=font_display)
+
+    # Título del diagrama
+    draw.text((30, 20), "MODELO DV-100-S | CÁMARA DE DESAIREACIÓN", fill="#0092B2", font=font_titulo)
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
 
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + ESCUDOS WEB OFICIALES)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + LOGOS OFICIALES)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">
@@ -157,8 +156,9 @@ HTML_PAGINA = """<!DOCTYPE html>
             <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
         </div>
         <div class="logos-container">
-            <!-- Enlaces web oficiales directos para los escudos -->
-            <img src="https://www.zaragoza.unam.mx/wp-content/uploads/2022/Logo-UNAM.png" class="logo-img" alt="Escudo UNAM" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/5/5e/Escudo_UNAM_vertical.svg';">
+            <!-- Escudo UNAM oficial -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Escudo_UNAM_vertical.svg" class="logo-img" alt="Escudo UNAM">
+            <!-- Escudo FES Zaragoza oficial[cite: 10] -->
             <img src="https://www.zaragoza.unam.mx/wp-content/2023/Descargas/FESZ50_color_transp.png" class="logo-img" alt="Escudo FES Zaragoza">
         </div>
     </div>

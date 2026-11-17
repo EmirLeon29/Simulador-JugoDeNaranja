@@ -5,9 +5,12 @@ import socketserver
 import urllib.parse
 import webbrowser
 import threading
+import os
 from io import BytesIO
-from urllib.request import urlopen
 from PIL import Image, ImageDraw, ImageFont
+
+# Directorio base para buscar la imagen local del SCADA si existe
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # =============================================================================
 # 1. MOTOR MATEMÁTICO EN UNIDADES SI (Módulo de Desaireación)
@@ -25,7 +28,7 @@ def simular_desaireacion(
     if flash_inviable or error_oxigeno:
         return {
             "valido": False,
-            "error_msg": "❌ Error Físico Inviable: Temperatura muy alta para el nivel de vacío (riesgo de flashing violento) o oxígeno inválido."
+            "error_msg": "❌ Error Físico Inviable: Temperatura muy alta para el nivel de vacío o oxígeno inválido."
         }
 
     eficiencia_remocion = min(98.0, max(85.0, 95.0 - (presion_vacio_kpa - 7.0) * 0.5))
@@ -52,12 +55,22 @@ def simular_desaireacion(
     }
 
 def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
-    """Descarga la imagen del equipo directamente desde GitHub y estampa la telemetría"""
-    url_imagen = "https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/image_17.png"
-    try:
-        with urlopen(url_imagen) as response:
-            img_data = response.read()
-        img = Image.open(BytesIO(img_data)).convert("RGB")
+    """Busca la imagen local image_17.png en la carpeta y estampa la telemetría"""
+    candidatos = [
+        os.path.join(BASE_DIR, "image_17.png"),
+        os.path.join(BASE_DIR, "image_17.jpg"),
+        "image_17.png",
+        "image_17.jpg"
+    ]
+    
+    img_path = None
+    for c in candidatos:
+        if os.path.exists(c):
+            img_path = c
+            break
+            
+    if img_path:
+        img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         try:
             font_numero = ImageFont.truetype("arial.ttf", 28)
@@ -75,18 +88,18 @@ def generar_imagen_scada_bytes(presion: float, temperatura: float) -> bytes:
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
-    except Exception as e:
-        # Imagen de respaldo por si no hay internet al momento de correrlo
+    else:
+        # Lienzo de respaldo si falta la imagen image_17
         img = Image.new("RGB", (600, 800), color=(240, 240, 240))
         draw = ImageDraw.Draw(img)
-        draw.text((30, 50), f"Error cargando imagen web: {e}", fill=(255, 0, 0))
+        draw.text((30, 50), "Coloca 'image_17.png' en la carpeta pages/", fill=(255, 0, 0))
         buf = BytesIO()
         img.save(buf, format="PNG")
         return buf.getvalue()
 
 
 # =============================================================================
-# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + ENLACES WEB DIRECTOS)
+# 2. INTERFAZ HTML/JS LOCAL (SCADA + AZUL CERÚLEO + ESCUDOS WEB OFICIALES)
 # =============================================================================
 HTML_PAGINA = """<!DOCTYPE html>
 <html lang="es">
@@ -144,9 +157,9 @@ HTML_PAGINA = """<!DOCTYPE html>
             <p class="mod-title">Ingeniería Química • Módulo de Desaireación - Zumo de Naranja</p>
         </div>
         <div class="logos-container">
-            <!-- Enlaces web directos a los escudos en GitHub -->
-            <img src="https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/logo_unam.png" class="logo-img" alt="Logo UNAM">
-            <img src="https://raw.githubusercontent.com/EmirLeon29/Simulador-JugoDeNaranja/main/pages/logo_fes.png" class="logo-img" alt="Logo FES Zaragoza">
+            <!-- Enlaces web oficiales directos para los escudos -->
+            <img src="https://www.zaragoza.unam.mx/wp-content/uploads/2022/Logo-UNAM.png" class="logo-img" alt="Escudo UNAM" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/5/5e/Escudo_UNAM_vertical.svg';">
+            <img src="https://www.zaragoza.unam.mx/wp-content/2023/Descargas/FESZ50_color_transp.png" class="logo-img" alt="Escudo FES Zaragoza">
         </div>
     </div>
 

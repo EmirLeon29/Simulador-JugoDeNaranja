@@ -216,7 +216,6 @@ HTML_PAGINA = """<!DOCTYPE html>
             document.getElementById('val_temp').innerText = temp.toFixed(1);
             document.getElementById('val_o2').innerText = o2.toFixed(1);
 
-            // Actualiza en tiempo real la imagen SCADA con la telemetría sobre los displays
             document.getElementById('scada_img').src = `/scada.png?presion=${presion}&temp=${temp}`;
             document.getElementById('caption_scada').innerText = `Telemetría Activa | Vacío: ${presion.toFixed(1)} kPa | Temp: ${temp.toFixed(1)} °C`;
 

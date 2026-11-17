@@ -186,8 +186,8 @@ if abs(suma_ext - 100.0) > 0.01:
         f"{fmt(suma_ext)} % (debe ser 100,00 %)."
     )
 
-tab1, tab2 = st.tabs(
-    ["1. Balance de Corrientes y Variación", "2. Simulación Acumulada por Turno"]
+tab1, tab2, tab3 = st.tabs(
+    ["1. Balance de Corrientes y Variación", "2. Simulación Acumulada por Turno", "3. Articulo"]
 )
 
 # --- Pestaña 1 ---
@@ -244,3 +244,7 @@ with tab2:
             }
         )
     st.dataframe(pd.DataFrame(filas_turno), hide_index=True, use_container_width=True)
+
+# --- Pestaña 3 ---
+with tab3:
+    

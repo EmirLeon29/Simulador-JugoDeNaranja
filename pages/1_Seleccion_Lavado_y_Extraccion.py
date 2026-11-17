@@ -261,5 +261,35 @@ with tab3:
         st.latex(r"V_{\text{h}} = \frac{V_{\text{anual}}}{D_{\text{anuales}}}")
     with st.container(border=True):
         st.markdown("**Flujo másico de zumo comercial (anual y diario):**")
-        st.latex(r"m_{\text{jugoo comercial}} = V_{\text{anual}} \times \rho")
+        st.latex(r"m_{\text{jugo comercial}} = V_{\text{anual}} \times \rho")
         st.latex(r"m_{\text{jugo, día}} = \frac{m_{\text{jugo comercial}}}{D_{\text{campaña}}}")
+    with st.container(border=True):
+        st.markdown("**Rendimiento másico del tamizado:**")
+        st.latex(r"\eta_{\text{tamiz}} = \frac{1 - \frac{\%\text{Pulpa}_{\text{extractor}}}{100}}{1 - \frac{\%\text{Pulpa}_{\text{comercial}}}{100}}") 
+    with st.container(border=True):
+        st.markdown("**Masa anual de jugo bruto a la salida del extractor:**")
+        st.latex(r"m_{\text{jugo bruto}} = \frac{m_{\text{jugo comercial}}}{\eta_{\text{tamiz}}}") 
+    with st.container(border=True):
+        st.markdown("**Naranja apta requerida a la entrada de extracción:**")
+        st.latex(r"m_{\text{naranja ext}} = \frac{m_{\text{jugo bruto}}}{\eta_{\text{ext}} / 100}") 
+    with st.container(border=True):
+        st.markdown("**Subproducto sólido (piel, segmentos del fruto y semillas): **")
+        st.latex(r"m_{\text{piel y semillas}} = m_{\text{naranja ext}} \times \left(\frac{f_{\text{piel y semillas}}}{100}\right)")
+    with st.container(border=True):
+        st.markdown("**Agua auxiliar añadida en los extractores:**")
+        st.latex(r"m_{\text{agua ext}} = \dot{m}_{\text{agua/extractor}} \times N_{\text{extractores}} \times H_{\text{anuales}}") 
+    with st.container(border=True):
+        st.markdown("**Verificación de cierre de balance de la fruta en extracción:**")
+        st.latex(r"\Sigma_{\text{ext}} = \eta_{\text{ext}} + f_{\text{piel y semillas}} + f_{\text{emulsión}} = 100\%")
+    with st.container(border=True):
+        st.markdown("**Lavado:**")
+        st.latex(r"m_{\text{ent lavado}} = \frac{m_{\text{ent sel 2}}}{\eta_{\text{lavado}} / 100}") 
+    with st.container(border=True):
+        st.markdown("**Flujos másicos diario y horario:**")
+        st.latex(r"\dot{m}_{i,\text{día}} = \frac{m_{i,\text{año}}}{D_{\text{campaña}}}")
+        st.latex(r"\dot{m}_{i,\text{h}} = \frac{m_{i,\text{año}}}{H_{\text{anuales}}}")
+
+
+
+
+

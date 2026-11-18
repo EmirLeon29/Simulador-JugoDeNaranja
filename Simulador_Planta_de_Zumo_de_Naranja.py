@@ -67,7 +67,7 @@ with col6:
         "microorganismos patógenos y enzimas."
     )
 
-col7, col8 = st.columns(2)
+colx, col7, col8, coly = st.columns(4)
 
 with col7:
     st.info(

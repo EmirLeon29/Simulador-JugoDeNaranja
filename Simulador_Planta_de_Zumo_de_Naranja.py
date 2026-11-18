@@ -26,8 +26,8 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.info(
         "**1. Selección, Lavado y Extracción**\n\n"
-        "Cálculo retrógrado desde jugo bruto hasta recepción de fruta, destríos, "
-        "piel/semillas y emulsión oleosa."
+        "Descarte de fruta dañada, higienización superficial y exprimido mecaánico para "
+        "obtener jugo bruto y subproductos (piel,semillas y aceites)."
     )
 
 with col2:

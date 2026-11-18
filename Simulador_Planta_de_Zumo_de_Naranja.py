@@ -43,7 +43,29 @@ with col3:
         "Almacenamiento intermedio estéril bajo atmósfera controlada para estabilizar el "
         "flujo continuo y evitar la recontaminación microbiológica."
     )
+    
+col4, col5, col6 = st.columns(3)
 
+with col4:
+    st.info(
+        "**4. Homogenización**\n\n"
+        "Reducción mecánica de partículas a alta presión para dar uniformidad física al jugo "
+        "y evitar la separación de fases."
+    )
+
+with col5:
+    st.info(
+        "**5. Desaireación**\n\n"
+        "Extracción de oxígeno disuelto al vacío para prevenir la oxidación de la vitamina C, "
+        "evitar formación de espuma y conservar el aroma."
+    )
+
+with col6:
+    st.info(
+        "**6. Pasteurización**\n\n"
+        "Tratamiento térmico controlado (HTST) e intercambio de calor para inactivar "
+        "microorganismos patógenos y enzimas."
+    )
 st.markdown("---")
 st.subheader("Parámetros Base de Diseño (Línea Base del Equipo)")
 

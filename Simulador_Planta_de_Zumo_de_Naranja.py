@@ -66,6 +66,23 @@ with col6:
         "Tratamiento térmico controlado (HTST) e intercambio de calor para inactivar "
         "microorganismos patógenos y enzimas."
     )
+
+col7, col8, col9 = st.columns(3)
+
+with col7:
+    st.info(
+        "**7. Envasado Aséptico**\n\n"
+        "Llenado y sellado hermético en ambiente comercialmente estéril sobre botellas "
+        "PET (1 L), contabilizando mermas de línea."
+    )
+
+with col8:
+    st.info(
+        "**8. Etiquetado**\n\n"
+        "Identificación comercial de unidades, codificación de lote y caducidad, agrupación "
+        "en packs y paletización para despacho."
+    )
+
 st.markdown("---")
 st.subheader("Parámetros Base de Diseño (Línea Base del Equipo)")
 

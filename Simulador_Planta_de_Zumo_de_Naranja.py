@@ -26,22 +26,22 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.info(
         "**1. Selección, Lavado y Extracción**\n\n"
-        "Descarte de fruta dañada, higienización superficial y exprimido mecaánico para "
+        "Descarte de fruta dañada, higienización superficial y exprimido mecánico para "
         "obtener jugo bruto y subproductos (piel,semillas y aceites)."
     )
 
 with col2:
     st.info(
-        "**2. Tamizado y Pasteurización**\n\n"
-        "Ajuste de contenido de pulpa (12 % a 8 %), tratamiento térmico y balances "
-        "de energía."
+        "**2. Tamizado y Enfriamiento**\n\n"
+        "Filtración para estandarizar el contenido de pulpa (del 12 % al 8 %) y descenso "
+        "térmico rápido para frenar la degradación enzimática."
     )
 
 with col3:
     st.info(
-        "**3. Envasado Aséptico y Fin de Línea**\n\n"
-        "Discretización de botellas PET (1 L), mermas de línea, formación de packs "
-        "y paletización."
+        "**3. Tanques Asépticos**\n\n"
+        "Almacenamiento intermedio estéril bajo atmósfera controlada para estabilizar el "
+        "flujo continuo y evitar la recontaminación microbiológica."
     )
 
 st.markdown("---")

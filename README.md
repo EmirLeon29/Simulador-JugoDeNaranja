@@ -6,7 +6,7 @@ selección, lavado, extracción y subproductos, con comparación contra la líne
 ## Colaboradores
 - Andrés Hernández Juan Pablo
 - Bringas Nova Marco Uriel
-- Escalante Pérez Sundhury Sinai
+- Escalante Perez Sundhury Sarahi
 - García Castillo Carlos Ulises
 - Hernández Medina Alondra 
 - León Salinas Emir Armando

@@ -507,7 +507,7 @@ if e6["alerta_sobrecarga"]:
 st.subheader("📊 Indicadores Globales de la Línea de Producción")
 g1, g2, g3, g4, g5, g6 = st.columns(6)
 g1.metric("Recepción Naranja", f"{fmt(e1['naranja_recep_kg_h'])} kg/h")
-g2.metric("Zumo Refinado", f"{fmt(e2['m_jugo_refinado_kg_h'])} kg/h")
+g2.metric("Jugo Refinado", f"{fmt(e2['m_jugo_refinado_kg_h'])} kg/h")
 g3.metric("Caudal Línea Aséptica", f"{fmt(e3['caudal_linea_l_h'])} L/h")
 g4.metric("Carga Térmica Total", f"{fmt(e2['q_enfriamiento_kw'] + e6['pot_calentamiento_kw'] + e6['pot_enfriamiento_kw'])} kW")
 g5.metric("Botellas Útiles / Jornada", f"{e8['botellas_finales_dia']:,} uds")
@@ -548,7 +548,7 @@ with st.container(border=True):
 with st.container(border=True):
     st.markdown("#### Etapa 2 · Tamizado y Enfriamiento")
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Zumo Refinado Salida", f"{fmt(e2['m_jugo_refinado_kg_h'])} kg/h")
+    c1.metric("Jugo Refinado Salida", f"{fmt(e2['m_jugo_refinado_kg_h'])} kg/h")
     c2.metric("Pulpa Retenida (Residuo)", f"{fmt(e2['m_pulpa_residuo_kg_h'])} kg/h")
     c3.metric("Pulpa Final en Zumo", f"{fmt(e2['x_pulpa_final_pct'])} %")
     c4.metric("Carga Térmica Enfriamiento", f"{fmt(e2['q_enfriamiento_kw'])} kW")

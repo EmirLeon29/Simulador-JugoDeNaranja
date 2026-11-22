@@ -112,7 +112,7 @@ def simular_pasteurizador(
 # =============================================================================
 def render_streamlit():
     st.set_page_config(page_title="Pasteurización - Zumo de Naranja", page_icon="🍊", layout="wide")
-    st.title("🍊 Módulo de Pasteurización Multitubular (Gémina JC-P/6500-A)")
+    st.title("🍊 Pasteurización Multitubular (Gémina JC-P/6500-A)")
     st.markdown(
         "**Flujo integrado:** `Desaireación` ➡️ **`Pasteurización`** ➡️ `Envasado Aséptico` | "
         "**Unidades en el Sistema Internacional (SI)**"

@@ -48,7 +48,7 @@ ETIQUETAS_PARAMETROS = [
 
 
 # ==============================================================================
-# 2. MOTOR DE CÁLCULO (idéntico al de la versión tkinter)
+# 2. MOTOR DE CÁLCULO 
 # ==============================================================================
 def resolver_balance(p: dict) -> dict:
     dias = p["dias_campana"]

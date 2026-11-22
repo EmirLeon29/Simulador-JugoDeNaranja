@@ -568,6 +568,7 @@ if sim:
 with flash_slot:
     mostrar_flash()
 
+st.markdown("---")
 st.markdown(
     """
 

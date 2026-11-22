@@ -155,7 +155,7 @@ def restaurar_base():
         st.session_state[k] = v
 
 
-st.title("🍊 Simulador de Proceso: Selección, Lavado y Extracción")
+st.title("🍊 Etapa 1. Selección, Lavado y Extracción")
 st.caption("Planta de Jugo de Naranja · Balance de materia")
 
 # --- Barra lateral: parámetros editables ---

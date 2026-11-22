@@ -567,3 +567,11 @@ if sim:
 # Mensajes de la última operación (arriba de la página)
 with flash_slot:
     mostrar_flash()
+
+st.markdown(
+    """
+
+    Integrantes del modulo.
+    - Andrés Hernandez Juan Pablo
+    """
+)

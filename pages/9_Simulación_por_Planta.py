@@ -411,7 +411,7 @@ def calcular_planta(cfg: dict) -> dict:
 # ==============================================================================
 inicializar_estado()
 
-st.title("🍊 Simulador Integral de Planta: Producción de Zumo de Naranja")
+st.title("🍊 Simulador Integral de Planta: Producción de Jugo de Naranja")
 st.caption(
     "Modalidad de Planta Completa · Balances de materia, energía y logística acoplados en serie"
 )

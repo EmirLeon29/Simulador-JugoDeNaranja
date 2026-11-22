@@ -571,6 +571,8 @@ with flash_slot:
 st.markdown("---")
 st.markdown(
     """
+    Referencias.
+    - Gémina Procesos Alimentarios, S.L. Tanques de Proceso [Folleto técnico]; Jumilla, Murcia, España, s.f. https://www.gemina.es (consultado el 21 de noviembre de 2026).
 
     Integrantes del modulo.
     - Andrés Hernandez Juan Pablo

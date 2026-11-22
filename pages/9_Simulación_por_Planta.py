@@ -541,7 +541,7 @@ with st.container(border=True):
     st.markdown("#### Etapa 1 · Selección, Lavado y Extracción")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Naranja Recepcionada", f"{fmt(e1['naranja_recep_kg_h'])} kg/h")
-    c2.metric("Zumo Bruto Obtenido", f"{fmt(e1['zumo_bruto_kg_h'])} kg/h")
+    c2.metric("Jugo Bruto Obtenido", f"{fmt(e1['zumo_bruto_kg_h'])} kg/h")
     c3.metric("Emulsión + Agua (Aceite)", f"{fmt(e1['emulsion_diluida_kg_h'])} kg/h")
     c4.metric("Subproductos Sólidos", f"{fmt(e1['subproductos_solidos_kg_h'])} kg/h")
 
@@ -550,7 +550,7 @@ with st.container(border=True):
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Jugo Refinado Salida", f"{fmt(e2['m_jugo_refinado_kg_h'])} kg/h")
     c2.metric("Pulpa Retenida (Residuo)", f"{fmt(e2['m_pulpa_residuo_kg_h'])} kg/h")
-    c3.metric("Pulpa Final en Zumo", f"{fmt(e2['x_pulpa_final_pct'])} %")
+    c3.metric("Pulpa Final en Jugo", f"{fmt(e2['x_pulpa_final_pct'])} %")
     c4.metric("Carga Térmica Enfriamiento", f"{fmt(e2['q_enfriamiento_kw'])} kW")
 
 with st.container(border=True):
@@ -575,7 +575,7 @@ with st.container(border=True):
 with st.container(border=True):
     st.markdown("#### Etapa 5 · Desaireación")
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Zumo Desaireado Salida", f"{fmt(e5['caudal_out_kg_h'])} kg/h")
+    c1.metric("Jugo Desaireado Salida", f"{fmt(e5['caudal_out_kg_h'])} kg/h")
     c2.metric("Oxígeno Disuelto Residual", f"{fmt(e5['o2_salida_mgl'])} mg/L", f"-{fmt(e5['efic_remocion_pct'], 1)} %")
     c3.metric("Volumen Tanque Vacío", f"{fmt(e5['vol_tanque_l'], 1)} L")
     c4.metric("Presión de Vacío", f"{fmt(cfg['p_presion_vacio_kpa'], 1)} kPa")

@@ -56,7 +56,7 @@ with col2:
     st.markdown("### 4. Unidad de Enfriamiento")
     
     # Carga de la imagen local del enfriador
-    ruta_enfriador = "img/enfriador.png"
+    ruta_enfriador = "img/enfriador.jfif"
     if os.path.exists(ruta_enfriador):
         st.image(ruta_enfriador, caption="Intercambiador de calor de placas", use_column_width=True)
     else:

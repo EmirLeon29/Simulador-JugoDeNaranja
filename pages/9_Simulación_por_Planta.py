@@ -4,7 +4,7 @@ import streamlit as st
 
 try:
     st.set_page_config(
-        page_title="Simulador Integral de Planta - Zumo de Naranja",
+        page_title="Simulador Integral de Planta - Jugo de Naranja",
         page_icon="🍊",
         layout="wide",
     )

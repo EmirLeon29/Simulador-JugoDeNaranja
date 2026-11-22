@@ -7,7 +7,7 @@ Ubicación: Palma del Río, Córdoba
 import streamlit as st
 
 def mostrar_homogeneizacion():
-    st.title("🎛️ Sección: Homogeneización")
+    st.title("🎛️ Homogeneización")
     st.markdown("""
     Esta sección calcula los parámetros de diseño y el balance energético de la etapa de **homogeneización** 
     para la línea de producción de zumo de naranja, evitando la separación de fases (sedimentación del suero).

@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-st.title("Módulo 10: Etiquetado")
+st.title("Etiquetado")
 st.markdown("Consumo de insumos y consolidación logística.")
 
 st.subheader("Parámetros de Operación")

@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 # Título de tu sección en la web del equipo
-st.subheader("Módulo 3 y 4: Tamizado y Enfriamiento")
+st.subheader("Etapa 2. Tamizado y Enfriamiento")
 st.markdown("---")
 
 # ==========================================

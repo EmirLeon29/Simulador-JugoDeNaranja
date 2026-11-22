@@ -60,7 +60,7 @@ with col2:
     if os.path.exists(ruta_enfriador):
         st.image(ruta_enfriador, caption="Intercambiador de calor de placas", use_column_width=True)
     else:
-        st.info("💡 Coloca tu imagen del enfriador en la ruta: `img/enfriador.png`")
+        st.info("💡 Coloca tu imagen del enfriador en la ruta: `img/enfriador.jfif`")
         
     st.metric(label="Carga Térmica del Sistema", value=f"{Q_kW:.2f} kW")
     st.metric(label="Temperatura de Salida", value=f"{T_out} °C")

@@ -79,3 +79,10 @@ with g_col1:
     ax.set_ylabel("kg/h")
     ax.set_title("Balance en Tamizado")
     st.pyplot(fig)
+
+with g_col2:
+    fig2, ax2 = plt.subplots(figsize=(4, 3))
+    ax2.bar(['Entrada', 'Salida'], [T_in, T_out], color=['#ff6666', '#3399ff'])
+    ax2.set_ylabel("°C")
+    ax2.set_title("Perfil Térmico (Enfriamiento)")
+    st.pyplot(fig2)

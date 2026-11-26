@@ -186,8 +186,8 @@ if abs(suma_ext - 100.0) > 0.01:
         f"{fmt(suma_ext)} % (debe ser 100,00 %)."
     )
 
-tab1, tab2, tab3 = st.tabs(
-    ["1. Balance de Corrientes y Variación", "2. Simulación Acumulada por Turno", "3. Articulo"]
+tab1, tab2 = st.tabs(
+    ["1. Balance de Corrientes y Variación", "2. Simulación Acumulada por Turno"]
 )
 
 # --- Pestaña 1 ---
@@ -245,84 +245,6 @@ with tab2:
         )
     st.dataframe(pd.DataFrame(filas_turno), hide_index=True, use_container_width=True)
 
-
-# --- Pestaña 3 ---
-with tab3:
-    st.markdown("<h3 style='text-align: center;'>Seleccion, Lavado y Extracción</h3>", unsafe_allow_html=True)
-    st.markdown(" ")
-    st.markdown("**Selección y Clasificación.** Esta operación preliminar tiene como objetivo garantizar la homogeneidad de la materia prima y evitar la contaminación de los lotes. El proceso inicia con una inspección visual y manual sobre bandas transportadoras de rodillos los cuales hacen girar la fruta para exponer toda su superficie con el fin de descartar naranjas podridas, dañadas mecánicamente o inmaduras. Posteriormente, la fruta pasa por clasificadores mecánicos (de rodillos divergentes o tambores perforados) que la agrupan por tamaño, asegurando que cada pieza se ajuste a las dimensiones exactas de los equipos de extracción. ")
-    st.markdown(" ")
-    st.markdown("**Lavado y Desinfección.** Para eliminar residuos de tierra, ceras, pesticidas y reducir la carga microbiana de la cáscara, la naranja se somete a un tratamiento combinado de acción física y química. Primero, ingresa a tinas de inmersión con agitación por inyección de aire que ablandan y desprenden la suciedad adherida. A continuación, avanza por túneles de lavado donde cepillos rotatorios de cerdas suaves (polipropileno o nylon) y aspersores de agua a presión limpian la epidermis sin dañarla. Simultáneamente, se aplican soluciones desinfectantes a base de hipoclorito de sodio o dióxido de cloro bajo parámetros controlados de concentración y tiempo de contacto, garantizando la inocuidad antes del exprimido.")
-    col1, col2, col3 = st.columns([3, 2, 3])
-    with col2:
-        st.image("images/lavadodenaranja.webp", use_container_width=True)
-    
-    st.markdown(" ")
-    st.markdown("**Extracción.** En esta etapa se separa la fase líquida (jugo y pulpa) de los componentes sólidos estructurales del fruto. Utilizando sistemas de extracción rotatoria, la naranja es seccionada por la mitad mediante cuchillas estacionarias y cada hemisferio es presionado contra cabezales giratorios acanalados que giran a velocidades controladas. Este diseño reproduce el principio del exprimido manual a nivel industrial, permitiendo regular la presión ejercida para obtener un alto rendimiento de jugo sin exprimir en exceso el albedo o el flavedo, evitando así el amargor y el exceso de aceites esenciales en el producto.")
-    col1, col2, col3 = st.columns([3, 2, 3])
-    with col2:
-        st.image("images/exprimidor.jpg", use_container_width=True)
-    
-    st.markdown(" ")
-    st.markdown("<h3 style='text-align: center;'>Proceso de Simulación</h3>", unsafe_allow_html=True)
-    st.markdown("Para realizar la simulación de estos pasos unitarios se utilizó principalmente la bibliografía “Diseño y Dimensionamiento De Una Línea de Elaboración de Zumo De Naranja Con Capacidad De 1,500,000 litros/año En Palma Del Río, Córdoba” siendo una tesis de la universidad politécnica de madrid, en la cual nos plantea el proceso para producir jugo de naranja, además de utilizar este documento para realizar los cálculos de la selección, lavado y extracción se optó por el uso de dos principales uso de IA´s “Gemini IA y Claude”.")
-    st.markdown("Se utilizaron las siguientes fórmulas:")
-
-    with st.container(border=True):
-        st.markdown("**Horas anuales de operación:**")
-        st.latex(r"H_{\text{anuales}} = D_{\text{campaña}} \times H_{\text{turno}}")
-    with st.container(border=True):
-        st.markdown("**Producción volumétrica diaria y horaria de zumo comercial:**")
-        st.latex(r"V_{\text{día}} = \frac{V_{\text{anual}}}{D_{\text{campaña}}}")
-        st.latex(r"V_{\text{h}} = \frac{V_{\text{anual}}}{D_{\text{anuales}}}")
-    with st.container(border=True):
-        st.markdown("**Flujo másico de zumo comercial (anual y diario):**")
-        st.latex(r"m_{\text{jugo comercial}} = V_{\text{anual}} \times \rho")
-        st.latex(r"m_{\text{jugo, día}} = \frac{m_{\text{jugo comercial}}}{D_{\text{campaña}}}")
-    with st.container(border=True):
-        st.markdown("**Rendimiento másico del tamizado:**")
-        st.latex(r"\eta_{\text{tamiz}} = \frac{1 - \frac{\%\text{Pulpa}_{\text{extractor}}}{100}}{1 - \frac{\%\text{Pulpa}_{\text{comercial}}}{100}}") 
-    with st.container(border=True):
-        st.markdown("**Masa anual de jugo bruto a la salida del extractor:**")
-        st.latex(r"m_{\text{jugo bruto}} = \frac{m_{\text{jugo comercial}}}{\eta_{\text{tamiz}}}") 
-    with st.container(border=True):
-        st.markdown("**Naranja apta requerida a la entrada de extracción:**")
-        st.latex(r"m_{\text{naranja ext}} = \frac{m_{\text{jugo bruto}}}{\eta_{\text{ext}} / 100}") 
-    with st.container(border=True):
-        st.markdown("**Subproducto sólido (piel, segmentos del fruto y semillas):**")
-        st.latex(r"m_{\text{piel y semillas}} = m_{\text{naranja ext}} \times \left(\frac{f_{\text{piel y semillas}}}{100}\right)")
-    with st.container(border=True):
-        st.markdown("**Agua auxiliar añadida en los extractores:**")
-        st.latex(r"m_{\text{agua ext}} = \dot{m}_{\text{agua/extractor}} \times N_{\text{extractores}} \times H_{\text{anuales}}") 
-    with st.container(border=True):
-        st.markdown("**Verificación de cierre de balance de la fruta en extracción:**")
-        st.latex(r"\Sigma_{\text{ext}} = \eta_{\text{ext}} + f_{\text{piel y semillas}} + f_{\text{emulsión}} = 100\%")
-    with st.container(border=True):
-        st.markdown("**Lavado:**")
-        st.latex(r"m_{\text{ent lavado}} = \frac{m_{\text{ent sel 2}}}{\eta_{\text{lavado}} / 100}") 
-    with st.container(border=True):
-        st.markdown("**Flujos másicos diario y horario:**")
-        st.latex(r"\dot{m}_{i,\text{día}} = \frac{m_{i,\text{año}}}{D_{\text{campaña}}}")
-        st.latex(r"\dot{m}_{i,\text{h}} = \frac{m_{i,\text{año}}}{H_{\text{anuales}}}")
-    with st.container(border=True):
-        st.markdown("**Rendimiento global de fruta recepcionada a jugo bruto:**")
-        st.latex(r"\eta_{\text{global}} = \left(\frac{m_{\text{jugo bruto}}}{m_{\text{recepción}}}\right) \times 100")
-    with st.container(border=True):
-        st.markdown("**Caudales horarios de enlace con el resto de la planta:**")
-        st.latex(r"\dot{m}_{\text{jugo bruto, h}} = \frac{m_{\text{jugo bruto}}}{H_{\text{anuales}}}") 
-        st.latex(r"\dot{m}_{\text{emulsión diluida, h}} = \frac{m_{\text{emulsión pura}} + m_{\text{agua ext}}}{H_{\text{anuales}}}") 
-        st.latex(r"\dot{m}_{\text{subproductos sólidos, h}} = \frac{m_{\text{piel y semillas}} + m_{\text{destrío 1}} + m_{\text{destrío 2}} + m_{\text{merma lavado}}}{H_{\text{anuales}}}")
-    with st.container(border=True):
-        st.markdown("**Simulación acumulada hora a hora en un turno:**")
-        st.latex(r"M_{i,\text{acum}}(h) = \dot{m}_{i,\text{h}} \times h")
-        
-    st.markdown(" ")
-    st.markdown("<h3 style='text-align: center;'>Prompts utilizados para la Inteligencia Artificial</h3>", unsafe_allow_html=True)
-    st.markdown("En donde para la ia de Gemini IA se le dio el siguiente prompt.")
-    st.markdown("“Buen dia, señorita gemini ia, requiero de su ayuda para mi siguiente proyecto, necesito realizar un código en python de las operaciones de la Selección, Lavado y Extracción del proceso de jugo de naranja, necesito que este código pueda modificar unas variables de entrada que sean Producción de Jugo Comercial en litros/año, Días de Campaña Extracción en días/año, Horas por Turno en horas/día, Densidad del Jugo en kilogramos/litros, Pulpa Salida Extractor (%), Pulpa Jugo Comercial (%), Rendimiento por Sección (%), Rendimiento Lavado (%), Fracción Piel y Semillas (%), Fracción Emulsión Aceite (%), Agua por extractor (kg/h), Número de extractores (ud), recuerda que este código lo debo de correr en local en la app de Visual Code Studio para verificar y modificar el código en lo que requiera.”")
-    st.markdown("Y mientras para el uso que se le dio a la IA de Claude se realizó el siguientes prompts, en donde uno se usó para la crear la página web mientras que el otros para los ajustes necesarios para hacerla funcionar.")
-    st.markdown("“Hola Claude tengo unos código listos para ejecutar en una página web, pero me puedes ayudar a crear los archivos necesarios para crear y ejecutar la página por medio de un link, ajustarlos para funcionar con la librería biblioteca Streamlit, y en github, por favor y gracias”")
-    st.markdown("“Hola, Claude deidad, necesito que adaptes este código  para poder integrarlo a la biblioteca de Streamlit, adjuntando el código hecho por gemini y modificado por los miembros del equipo”")
 
 st.markdown("---")
 st.markdown(
